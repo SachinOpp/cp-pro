@@ -17,40 +17,18 @@ from pyrogram.errors import FloodWait
 
 
 SACHIN = [
-    "https://graph.org/file/9bba2b7ee9ba3806de65d.jpg",
-    "https://graph.org/file/ef82f289043a4fa74f8ff.jpg",
-    "https://graph.org/file/9c27c68958e06ae074c38.jpg",
-    "https://graph.org/file/0ff325b1d2efe80299aa3.jpg",
-    "https://graph.org/file/41167b953cf3579853d47.jpg",
-    "https://graph.org/file/bd93ab42e69305f274028.jpg",
-    "https://graph.org/file/97575db5586c05d6b2898.jpg",
-    "https://graph.org/file/07c393fdf931a407c9bc0.jpg",
-    "https://graph.org/file/f332767490ad3a5ca20e8.jpg",
-    "https://graph.org/file/f3449e9069667f647d14e.jpg",
-    "https://graph.org/file/9f51cdc739f907cbd2c7e.jpg",
-    "https://telegra.ph/file/d7a6a923c38e051ce35f3.jpg",
-    "https://graph.org/file/f86b71018196c5cfe7344.jpg",
-    "https://graph.org/file/a3db9af88f25bb1b99325.jpg",
-    "https://graph.org/file/5b344a55f3d5199b63fa5.jpg",
-    "https://graph.org/file/84de4b440300297a8ecb3.jpg",
-    "https://graph.org/file/84e84ff778b045879d24f.jpg",
-    "https://graph.org/file/a4a8f0e5c0e6b18249ffc.jpg",
-    "https://graph.org/file/ed92cada78099c9c3a4f7.jpg",
-    "https://graph.org/file/d6360613d0fa7a9d2f90b.jpg",
-    "https://graph.org/file/37248e7bdff70c662a702.jpg",
-    "https://graph.org/file/0bfe29d15e918917d1305.jpg",
-    "https://graph.org/file/16b1a2828cc507f8048bd.jpg",
-    "https://graph.org/file/e6b01f23f2871e128dad8.jpg",
-    "https://graph.org/file/cacbdddee77784d9ed2b7.jpg",
-    "https://graph.org/file/ddc5d6ec1c33276507b19.jpg",
-    "https://graph.org/file/39d7277189360d2c85b62.jpg",
-    "https://graph.org/file/5846b9214eaf12c3ed100.jpg",
-    "https://graph.org/file/ad4f9beb4d526e6615e18.jpg",
-    "https://graph.org/file/3514efaabe774e4f181f2.jpg",    
+    "https://telegra.ph/file/f93922c55aee3a6fd78fd.jpg",
+	"https://telegra.ph/file/19324749c0f95fb51b2e3.jpg",
+	"https://telegra.ph/file/ff3b523818496ef11a653.jpg",
+	"https://telegra.ph/file/7eea2faff832459751cb3.jpg",
+	"https://telegra.ph/file/2d8a8d60ec9386d005403.jpg",
+	"https://telegra.ph/file/2131608d4815b72e0e531.jpg",
+	"https://telegra.ph/file/9896ef801de258dc9833c.jpg",
+	"https://telegra.ph/file/ba108f479b0e3df04462e.jpg",
 ]
 
 
-start_txt = """<b> ❖ ʜɪɪ ʙᴀʙʏ, ɴɪᴄᴇ ᴛᴏ ᴍᴇᴇᴛ ᴜʜʜ !\n━━━━━━━━━━━━━━━━━━━━━━\n\n● ɪ ᴀᴍ ɢʀᴏᴜᴘ ᴘʀᴏᴛᴇᴄᴛɪᴏɴ ᴄᴏᴘʏʀɪɢʜᴛ ʙᴏᴛ.\n● ɪ ʜᴀᴠᴇ ɢʀᴏᴜᴘ ᴘʀᴏᴛᴇᴄᴛɪᴏɴ ғᴇᴀᴛᴜʀᴇs.\n\n❖ ᴘᴏᴡᴇʀᴇᴅ ʙʏ ➥ ʀ ᴏ ʏ - ᴇ ᴅ ɪ ᴛ x ࿐ </b>"""
+start_txt = """<b> ❖ ʜɪɪ ʙᴀʙʏ, ɴɪᴄᴇ ᴛᴏ ᴍᴇᴇᴛ ᴜʜʜ !\n━━━━━━━━━━━━━━━━━━━━━━\n\n● ɪ ᴀᴍ ɢʀᴏᴜᴘ ᴘʀᴏᴛᴇᴄᴛɪᴏɴ ᴄᴏᴘʏʀɪɢʜᴛ ʙᴏᴛ.\n● ɪ ʜᴀᴠᴇ ɢʀᴏᴜᴘ ᴘʀᴏᴛᴇᴄᴛɪᴏɴ ғᴇᴀᴛᴜʀᴇs.\n\n❖ ᴘᴏᴡᴇʀᴇᴅ ʙʏ ➥ 🇸ᴀ ɴ ᴀ ᴛ ᴀ ɴ ɪ₰ </b>"""
 
 @app.on_message(filters.command("start"))
 async def start(_, msg):
@@ -76,16 +54,16 @@ async def start(_, msg):
 
 gd_buttons = [              
         [
-            InlineKeyboardButton("ᴜᴘᴅᴀᴛᴇ", url="https://t.me/roy_editx"),
-            InlineKeyboardButton("sᴜᴘᴘᴏʀᴛ", url="https://t.me/THE_FRIENDZ"),    
+            InlineKeyboardButton("• ᴜᴘᴅᴀᴛᴇ •", url="https://t.me/ALL_SANATANI_BOT"),
+            InlineKeyboardButton("• sᴜᴘᴘᴏʀᴛ •", url="https://t.me/+cW07X2RM_IBmYTI1"),    
         ]
         ]
 # ------------------------------------------------------------------------------- #
 
 ROY_BTN = [              
         [
-            InlineKeyboardButton("sᴜᴘᴘᴏʀᴛ", url="https://t.me/the_friendz"),
-            InlineKeyboardButton("ᴜᴘᴅᴀᴛᴇ", url="https://t.me/roy_editx"),    
+            InlineKeyboardButton("• sᴜᴘᴘᴏʀᴛ •", url="https://t.me/+cW07X2RM_IBmYTI1"),
+            InlineKeyboardButton("• ᴜᴘᴅᴀᴛᴇ •", url="https://t.me/ALL_SANATANI_BOT"),    
         ]
 ]
 # ------------------------------------------------------------------------------- #
@@ -96,14 +74,14 @@ async def cutebackbutton(client, callback_query: CallbackQuery, _):
     try:
         startkeyboard = [
             [ 
-              InlineKeyboardButton("ᴀᴅᴅ ᴍᴇ ʙᴀʙʏ", url=f"https://t.me/{BOT_USERNAME}?startgroup=true")
+              InlineKeyboardButton("• ᴀᴅᴅ ᴍᴇ ʙᴀʙʏ •", url=f"https://t.me/{BOT_USERNAME}?startgroup=true")
             ],
             [
-              InlineKeyboardButton("ᴀʙᴏᴜᴛ", callback_data="nykaa_back"),
-              InlineKeyboardButton("ʜᴇʟᴘ", callback_data="roy_back")
+              InlineKeyboardButton("• ᴀʙᴏᴜᴛ •", callback_data="nykaa_back"),
+              InlineKeyboardButton("• ʜᴇʟᴘ •", callback_data="roy_back")
             ],
             [
-              InlineKeyboardButton("sᴏᴜʀᴄᴇ ᴄᴏᴅᴇ", callback_data="gib_source"),
+              InlineKeyboardButton("• sᴏᴜʀᴄᴇ ᴄᴏᴅᴇ •", callback_data="gib_source"),
             ]
         ]
         await callback_query.message.edit_caption(start_txt,  
@@ -129,13 +107,13 @@ ABOUT_STRING = """**❖ ɪ ʜᴀᴠᴇ ᴍᴏsᴛ ᴘᴏᴡᴇʀғᴜʟʟ ɢʀ�
 
 # -------------------------------------------------------------------------------------
 
-HELP_STRING = """**❖ ᴏᴡɴᴇʀ/sᴜᴅᴏ ᴜsᴇʀ ᴄᴍᴅs ⏤͟͟͞͞★\n\n● /bcast ➥ ʙʀᴏᴀᴅᴄᴀsᴛ ᴀɴʏ ᴍᴇssᴀɢᴇ.\n● /announce ➥ ʀᴇᴘʟʏ ᴀɴʏ ᴍᴇssᴀɢᴇ ᴛᴏ ᴀɴɴᴏᴜɴᴄᴇ.\n\n❖ ᴀʟʟ ᴜsᴇʀs  ᴄᴏᴍᴍᴀɴᴅs ⏤͟͟͞͞★\n\n● /start ➥ sᴛᴀʀᴛ ᴛʜᴇ ʙᴏᴛ.\n● /ping ➥ ᴄʜᴋ ʙᴏᴛ ᴘɪɴɢ sᴛᴀᴛs.\n● /repo ➥ ɢᴇᴛ ʙᴏᴛ ʀᴇᴘᴏ.\n\n❖ ᴘᴏᴡᴇʀᴇᴅ ʙʏ ➥  ʀ ᴏ ʏ - ᴇ ᴅ ɪ ᴛ x ࿐**"""
+HELP_STRING = """**❖ ᴏᴡɴᴇʀ/sᴜᴅᴏ ᴜsᴇʀ ᴄᴍᴅs ⏤͟͟͞͞★\n\n● /bcast ➥ ʙʀᴏᴀᴅᴄᴀsᴛ ᴀɴʏ ᴍᴇssᴀɢᴇ.\n● /announce ➥ ʀᴇᴘʟʏ ᴀɴʏ ᴍᴇssᴀɢᴇ ᴛᴏ ᴀɴɴᴏᴜɴᴄᴇ.\n\n❖ ᴀʟʟ ᴜsᴇʀs  ᴄᴏᴍᴍᴀɴᴅs ⏤͟͟͞͞★\n\n● /start ➥ sᴛᴀʀᴛ ᴛʜᴇ ʙᴏᴛ.\n● /ping ➥ ᴄʜᴋ ʙᴏᴛ ᴘɪɴɢ sᴛᴀᴛs.\n● /repo ➥ ɢᴇᴛ ʙᴏᴛ ʀᴇᴘᴏ.\n\n❖ ᴘᴏᴡᴇʀᴇᴅ ʙʏ ➥ 🇸ᴀ ɴ ᴀ ᴛ ᴀ ɴ ɪ₰**"""
 
 # ------------------------------------------------------------------------------- #
 
 EVAA = [
     [
-        InlineKeyboardButton(text="ᴀᴅᴅ ᴍᴇ ʙᴀʙʏ", url=f"https://t.me/{BOT_USERNAME}?startgroup=true"),
+        InlineKeyboardButton(text="• ᴀᴅᴅ ᴍᴇ ʙᴀʙʏ •", url=f"https://t.me/{BOT_USERNAME}?startgroup=true"),
     ],
 ]
 
@@ -153,15 +131,19 @@ REPO_STRING = """**
 
 ● ɪғ ʏᴏᴜ ᴡᴀɴᴛ ᴄᴏᴘʏʀɪɢʜᴛ sʜɪᴇʟᴅ ʙᴏᴛ ⚡ ʀᴇᴘᴏ, ᴛʜᴇɴ ᴄʟɪᴄᴋ ᴏɴ ᴛʜᴇ sᴏᴜʀᴄᴇ ᴄᴏᴅᴇ ʙᴜᴛᴛᴏɴ ᴛᴏ ɢᴇᴛ ᴍʏ sᴏᴜʀᴄᴇ ᴄᴏᴅᴇ.
 
-❖ ᴘᴏᴡᴇʀᴇᴅ ʙʏ ➥ ʀ ᴏ ʏ - ᴇ ᴅ ɪ ᴛ x ❅
+❖ ᴘᴏᴡᴇʀᴇᴅ ʙʏ ➥ 🇸ᴀ ɴ ᴀ ᴛ ᴀ ɴ ɪ₰
 """
 
 @app.on_message(filters.command("repo"))
 async def start(_, msg):
     REPO_BTN = [
-        [
-          InlineKeyboardButton("sᴏᴜʀᴄᴇ ᴄᴏᴅᴇ", url="https://github.com/tinaarobot/COPYRIGHT"),
+	      [
+          InlineKeyboardButton(text="• ᴀᴅᴅ ᴍᴇ ʙᴀʙʏ •", url=f"https://t.me/{BOT_USERNAME}?startgroup=true"),
           ],
+		  [
+          InlineKeyboardButton("• ʀᴇᴘᴏ •", url="https://github.com/SANATANI-EDITZ/COPYRIGHT"),
+          InlineKeyboardButton("• sᴜᴘᴘᴏʀᴛ •", url="https://t.me/+cW07X2RM_IBmYTI1"),
+		  ],
     ]
     
     reply_markup = InlineKeyboardMarkup(REPO_BTN)
@@ -191,7 +173,7 @@ def size_formatter(bytes: int) -> str:
 
 @app.on_message(filters.command("ping"))
 async def activevc(_, message: Message):
-    uptime = time_formatter((time.time() - start_time) * 1000)
+    uptime = time_formatter((time.time() - start_text) * 1000)
     cpu = psutil.cpu_percent()
     storage = psutil.disk_usage('/')
 
@@ -205,7 +187,7 @@ async def activevc(_, message: Message):
         f"● ᴜsᴇᴅ ➥ {size_formatter(storage.used)}\n"
         f"● ғʀᴇᴇ ➥ {size_formatter(storage.free)}\n"
         f"● ᴘʏᴛʜᴏɴ ᴠᴇʀsɪᴏɴ ➥ {python_version}\n\n"
-        f"❖ ᴘᴏᴡᴇʀᴇᴅ ʙʏ ➥  ʀ ᴏ ʏ - ᴇ ᴅ ɪ ᴛ x ࿐"
+        f"❖ ᴘᴏᴡᴇʀᴇᴅ ʙʏ ➥  🇸ᴀ ɴ ᴀ ᴛ ᴀ ɴ ɪ₰"
     )
 
     await message.reply(reply_text, reply_markup=InlineKeyboardMarkup(EVAA), quote=True)
