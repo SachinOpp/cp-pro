@@ -4,7 +4,7 @@ from pyrogram import idle
 from MAFU import MAFU
 from MAFU.modules import ALL_MODULES
 
-LOGGER_ID = -1002010924139
+LOGGER_ID = -1002090474484
 
 loop = asyncio.get_event_loop()
 
