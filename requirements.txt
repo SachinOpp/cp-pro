@@ -1,10 +1,10 @@
-motor
-pymongo
+motor==3.4.0
+pymongo==4.6.1
 apscheduler
 psutil
-pyrogram
-requests
-tgcrypto
-asyncio
-python-dotenv
+pyrogram==2.0.106
+requests==2.31.0
+tgcrypto==1.2.5
+asyncio==3.4.3
+python-dotenv==1.0.0
 heroku3
