@@ -10,12 +10,15 @@ START_IMG = "https://files.catbox.moe/jhlnjc.jpg"
 START_CAPTION = "**✨ ʜᴇʏ ʙᴀʙʏ! ɪ'ᴍ ᴀʟɪᴠᴇ ᴀɴᴅ ʀᴇᴀᴅʏ ᴛᴏ ᴘʀᴏᴛᴇᴄᴛ ʏᴏᴜʀ ɢʀᴏᴜᴘ ✨**"
 
 START_BUTTONS = InlineKeyboardMarkup([
-    [InlineKeyboardButton("• ᴀᴅᴅ ᴍᴇ ɪɴ ʏᴏᴜʀ ɢʀᴏᴜᴘ •", url=f"https://t.me/{BOT_USERNAME}?startgroup=true")],
+    [
+        InlineKeyboardButton("• ᴀᴅᴅ ᴍᴇ ɪɴ ʏᴏᴜʀ ɢʀᴏᴜᴘ •", url=f"https://t.me/{BOT_USERNAME}?startgroup=true")],
     [
         InlineKeyboardButton("• ʜᴇʟᴘ •", callback_data="show_help"),
         InlineKeyboardButton("• ᴀʙᴏᴜᴛ •", callback_data="show_about")
     ],
-    [InlineKeyboardButton("• ᴏᴡɴᴇʀ •", url=f"https://t.me/{OWNER_ID}")]
+    [
+        InlineKeyboardButton("• ᴏᴡɴᴇʀ •", user_id=config.OWNER_ID)
+    ]
 ])
 
 
