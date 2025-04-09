@@ -1,7 +1,7 @@
 from pyrogram import Client, filters
 from pyrogram.types import Message, InlineKeyboardMarkup, InlineKeyboardButton, CallbackQuery
 
-from MAFU import app
+from MAFU import MAFU as app
 from MAFU.helper.database import get_users, get_chats, get_new_users, get_new_chats
 
 
