@@ -21,7 +21,7 @@ async def get_target_user(message: Message):
             return None
     return None
 
-@app.on_message(filters.command("auth") & filters.group)
+@app.on_message(filters.command("auth", prefixes=["/", "!", "%", ",", ".", "@", "#"]) & filters.group)
 async def add_auth_command(client, message: Message):
     if not await is_admins(message.chat.id, message.from_user.id):
         return await message.reply("❌ Only group owner or admins can use this command!")
@@ -33,7 +33,7 @@ async def add_auth_command(client, message: Message):
     await add_auth(message.chat.id, user.id)
     await message.reply(f"✅ User has been **authorized**.\n\n{format_user(user)}")
 
-@app.on_message(filters.command("rmauth") & filters.group)
+@app.on_message(filters.command("rmauth", prefixes=["/", "!", "%", ",", ".", "@", "#"]) & filters.group)
 async def remove_auth_command(client, message: Message):
     if not await is_admins(message.chat.id, message.from_user.id):
         return await message.reply("❌ Only group owner or admins can use this command!")
@@ -47,7 +47,7 @@ async def remove_auth_command(client, message: Message):
 
 from pyrogram.types import InlineKeyboardMarkup, InlineKeyboardButton
 
-@app.on_message(filters.command("authlist") & filters.group)
+@app.on_message(filters.command("authlist", prefixes=["/", "!", "%", ",", ".", "@", "#"]) & filters.group)
 async def authlist_handler(client, message: Message):
     # Check if user is admin
     if not await is_admins(message.chat.id, message.from_user.id):
