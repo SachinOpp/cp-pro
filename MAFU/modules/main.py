@@ -2,7 +2,7 @@ from pyrogram import filters
 from pyrogram.types import InlineKeyboardButton, InlineKeyboardMarkup, Message, CallbackQuery
 
 from config import OWNER_ID, BOT_USERNAME
-from config import *
+import config
 from MAFU import MAFU as app
 
 
