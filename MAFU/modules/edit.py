@@ -30,28 +30,27 @@ async def edit_toggle(client, message: Message):
 
     if not await is_admins(chat_id, user_id):
         return await message.reply_text(
-            "❖ ʏᴏᴜ ᴀʀᴇ ɴᴏᴛ ᴀɴ ᴀᴅᴍɪɴ !!",
-            reply_markup=InlineKeyboardMarkup([[InlineKeyboardButton("ᴄʟᴏsᴇ", callback_data="close")]])
+            "You are not an admin!",
+            reply_markup=InlineKeyboardMarkup([[InlineKeyboardButton("Close", callback_data="close")]])
         )
 
     try:
         bot_member = await client.get_chat_member(chat_id, client.me.id)
         if not bot_member.privileges or not bot_member.privileges.can_delete_messages:
             return await message.reply(
-                f"<b>❖ {message.from_user.mention}, </b>\n\n"
-                f"<b>๏ ɪ ᴅᴏɴ'ᴛ ʜᴀᴠᴇ ᴅᴇʟᴇᴛᴇ ᴘᴇʀᴍɪssɪᴏɴ !!</b>",
-                reply_markup=InlineKeyboardMarkup([[InlineKeyboardButton("ᴄʟᴏsᴇ", callback_data="close")]])
+                f"{message.from_user.mention}, I don't have delete permission!",
+                reply_markup=InlineKeyboardMarkup([[InlineKeyboardButton("Close", callback_data="close")]])
             )
     except:
         return
 
     status = "ON" if get_delete_status(chat_id) else "OFF"
     keyboard = InlineKeyboardMarkup([
-        [InlineKeyboardButton("ᴏɴ", callback_data="edit_on"),
-         InlineKeyboardButton("ᴏғғ", callback_data="edit_off")],
-        [InlineKeyboardButton("ᴄʟᴏsᴇ", callback_data="edit_close")]
+        [InlineKeyboardButton("ON", callback_data="edit_on"),
+         InlineKeyboardButton("OFF", callback_data="edit_off")],
+        [InlineKeyboardButton("Close", callback_data="close")]
     ])
-    await message.reply(f"❖ ᴇᴅɪᴛ ᴅᴇʟᴇᴛᴇ ғᴇᴀᴛᴜʀᴇ ɪs ᴄᴜʀʀᴇɴᴛʟʏ {status}.", reply_markup=keyboard)
+    await message.reply(f"Edit delete feature is currently {status}.", reply_markup=keyboard)
 
 # Handle button actions
 @app.on_callback_query(filters.regex("^edit_"))
@@ -61,14 +60,14 @@ async def handle_callback(client, callback_query):
     data = callback_query.data
 
     if not await is_admins(chat_id, user_id):
-        return await callback_query.answer("❖ ʏᴏᴜ ᴀʀᴇ ɴᴏᴛ ᴀᴜᴛʜᴏʀɪᴢᴇᴅ !!", show_alert=True)
+        return await callback_query.answer("You are not authorized!", show_alert=True)
 
     if data == "edit_on":
         set_delete_status(chat_id, True)
-        await callback_query.message.edit_text("<b>❖ ᴇᴅɪᴛ ᴅᴇʟᴇᴛᴇ ғᴇᴀᴛᴜʀᴇ ɪs ɴᴏᴡ ᴏɴ !!</b>")
+        await callback_query.message.edit_text("Edit delete feature is now ON.")
     elif data == "edit_off":
         set_delete_status(chat_id, False)
-        await callback_query.message.edit_text("<b>❖ ᴇᴅɪᴛ ᴅᴇʟᴇᴛᴇ ғᴇᴀᴛᴜʀᴇ ɪs ɴᴏᴡ ᴏғғ !!</b>")
+        await callback_query.message.edit_text("Edit delete feature is now OFF.")
     elif data == "edit_close":
         try:
             await callback_query.message.delete()
@@ -93,33 +92,38 @@ async def delete_edited_message(client, message: Message):
         if not bot_member.privileges or not bot_member.privileges.can_delete_messages:
             return
 
-        old_text = message.text or "❖ ɴᴏ ᴛᴇxᴛ ᴀᴠᴀɪʟᴀʙʟᴇ"
+        old_text = message.text or "No text available"
         await asyncio.sleep(2)
         await message.delete()
 
+        # Normal log text
         log_text = (
-            f"**❖ ᴇᴅɪᴛᴇᴅ ᴍᴇssᴀɢᴇ ᴅᴇʟᴇᴛᴇᴅ !!**\n\n"
-            f"**๏ ᴜsᴇʀ :** {message.from_user.first_name} ({user_id})\n"
-            f"**๏ ᴜsᴇʀɴᴀᴍᴇ :** @{message.from_user.username if message.from_user.username else 'ɴᴏɴᴇ'}\n"
-            f"**๏ ᴍᴇɴᴛɪᴏɴ :** {message.from_user.mention}\n"
-            f"**๏ ɢʀᴏᴜᴘ :** {message.chat.title}\n"
-            f"**๏ ᴄʜᴀᴛ ɪᴅ :** ({chat_id})\n"
-            f"**๏ ᴏʟᴅ ᴍᴇssᴀɢᴇ :**`{old_text}`\n"
-            f"**๏ ᴇᴅɪᴛᴇᴅ ᴍᴇssᴀɢᴇ :**`{message.text}`\n\n"
-            f"**❖ ʙᴏᴛ ɴᴀᴍᴇ :  @{BOT_USERNAME} **"
+            f"Edited message deleted!\n\n"
+            f"User: {message.from_user.first_name} ({user_id})\n"
+            f"Username: @{message.from_user.username if message.from_user.username else 'None'}\n"
+            f"Mention: {message.from_user.mention}\n"
+            f"Group: {message.chat.title}\n"
+            f"Chat ID: {chat_id}\n"
+            f"Old message: `{old_text}`\n"
+            f"Edited message: `{message.text}`\n\n"
+            f"Bot Name: @{BOT_USERNAME}"
         )
 
-        await client.send_message(OTHER_LOGS, log_text)
-
         keyboard = InlineKeyboardMarkup([
-            [InlineKeyboardButton("ᴄʟᴏsᴇ", callback_data="close")]
+            [InlineKeyboardButton("Add me in your group", url=f"https://t.me/{BOT_USERNAME}?startgroup=true")]
+        ])
+
+        await client.send_message(OTHER_LOGS, log_text, reply_markup=keyboard)
+
+        user_notice_keyboard = InlineKeyboardMarkup([
+            [InlineKeyboardButton("Close", callback_data="close")]
         ])
         await message.reply(
-            f"<b>❖ ʜᴇʏ , {message.from_user.mention} !! </b>\n"
-            f"<b>๏ ʏᴏᴜ ᴇᴅɪᴛᴇᴅ ᴀ ᴍᴇssᴀɢᴇ, sᴏ ɪ ᴅᴇʟᴇᴛᴇᴅ ɪᴛ !!</b>\n\n"
-            f"<b>❖ ᴏɴ|ᴏғғ ᴄᴍᴍɴᴅ : /edit</b>\n"
-            f"<b>❖ ʟᴏɢs : [ʏᴏᴜʀ ʙɪᴏ ʟᴏɢs](https://t.me/YourLogger)</b>",
-            reply_markup=keyboard
+            f"Hey {message.from_user.mention},\n"
+            f"You edited a message, so I deleted it.\n\n"
+            f"To turn this feature on|off, use /edit\n"
+            f"Check Your Logs: [Your Logs](https://t.me/Copyright_logs)",
+            reply_markup=user_notice_keyboard
         )
     except Exception as e:
         print(f"[EditDelete Error] {e}")
