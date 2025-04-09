@@ -45,6 +45,8 @@ async def remove_auth_command(client, message: Message):
     await remove_auth(message.chat.id, user.id)
     await message.reply(f"❌ User has been **unauthorized**.\n\n{format_user(user)}")
 
+from pyrogram.types import InlineKeyboardMarkup, InlineKeyboardButton
+
 @app.on_message(filters.command("authlist") & filters.group)
 async def authlist_handler(client, message: Message):
     # Check if user is admin
@@ -67,4 +69,10 @@ async def authlist_handler(client, message: Message):
             name = f"`{user_id}` (Unable to fetch)"
         text += f"{i}. {name}\n"
 
-    await message.reply(text)
+    # Send message with Close button
+    await message.reply(
+        text,
+        reply_markup=InlineKeyboardMarkup(
+            [[InlineKeyboardButton("🗑 Close", callback_data="close")]]
+        )
+    )
