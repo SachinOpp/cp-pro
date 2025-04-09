@@ -2,7 +2,7 @@ from pyrogram import filters
 from pyrogram.types import Message, InlineKeyboardButton, InlineKeyboardMarkup
 from MAFU import MAFU as app
 from MAFU.helper.chatsdb import get_chats
-from MAFU.helper.userssdb import get_users
+from MAFU.helper.usersdb import get_users
 
 
 @app.on_message(filters.command("stats"))
