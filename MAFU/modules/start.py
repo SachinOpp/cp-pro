@@ -1,7 +1,7 @@
 from pyrogram import filters
 from pyrogram.types import InlineKeyboardButton, InlineKeyboardMarkup, Message, CallbackQuery
 from config import OWNER_ID, BOT_USERNAME
-from MAFU import app
+from MAFU import MAFU as app
 
 START_IMG = "https://files.catbox.moe/jhlnjc.jpg"
 START_CAPTION = "**✨ ʜᴇʏ ʙᴀʙʏ! ɪ'ᴍ ᴀʟɪᴠᴇ ᴀɴᴅ ʀᴇᴀᴅʏ ᴛᴏ ᴘʀᴏᴛᴇᴄᴛ ʏᴏᴜʀ ɢʀᴏᴜᴘ ✨**"
