@@ -25,8 +25,7 @@ def get_readable_time(seconds: int) -> str:
         ping_time += str(time_list[i]) + time_suffix_list[i] + " "
     return ping_time.strip()
 
-
-@app.on_message(filters.command("ping") & filters.private)
+@app.on_message(filters.command("ping", prefixes=["/", "!", "%", ",", ".", "@", "#"]))
 async def ping_command(_, message: Message):
     start = time.time()
     reply = await message.reply_text("🏓")
