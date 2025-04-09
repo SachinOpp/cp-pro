@@ -4,7 +4,7 @@ import asyncio
 from pymongo import MongoClient
 
 from MAFU import MAFU as app
-from config import MONGO_URL, OTHER_LOGS
+from config import MONGO_URL, OTHER_LOGS, BOT_USERNAME
 from MAFU.helper.auth import is_auth
 from MAFU.helper.admin import is_admins
 
@@ -106,13 +106,13 @@ async def delete_edited_message(client, message: Message):
             f"**๏ ᴄʜᴀᴛ ɪᴅ :** ({chat_id})\n"
             f"**๏ ᴏʟᴅ ᴍᴇssᴀɢᴇ :**`{old_text}`\n"
             f"**๏ ᴇᴅɪᴛᴇᴅ ᴍᴇssᴀɢᴇ :**`{message.text}`\n\n"
-            f"**❖ ʙᴏᴛ ɴᴀᴍᴇ :  @{app.username} **"
+            f"**❖ ʙᴏᴛ ɴᴀᴍᴇ :  @{BOT_USERNAME} **"
         )
 
         await client.send_message(OTHER_LOGS, log_text)
 
         keyboard = InlineKeyboardMarkup([
-            [InlineKeyboardButton("ᴄʟᴏsᴇ", callback_data="edit_close")]
+            [InlineKeyboardButton("ᴄʟᴏsᴇ", callback_data="close")]
         ])
         await message.reply(
             f"<b>❖ ʜᴇʏ , {message.from_user.mention} !! </b>\n"
