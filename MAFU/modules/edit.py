@@ -96,34 +96,39 @@ async def delete_edited_message(client, message: Message):
         await asyncio.sleep(2)
         await message.delete()
 
-        # Normal log text
+        # Log text for OTHER_LOGS
         log_text = (
             f"Edited message deleted!\n\n"
-            f"User: {message.from_user.first_name} ({user_id})\n"
+            f"User: {message.from_user.first_name}"
+            f"User id: `{user_id}`\n"
             f"Username: @{message.from_user.username if message.from_user.username else 'None'}\n"
             f"Mention: {message.from_user.mention}\n"
             f"Group: {message.chat.title}\n"
             f"Chat ID: {chat_id}\n"
-            f"Old message: `{old_text}`\n"
             f"Edited message: `{message.text}`\n\n"
-            f"Bot Name: @{BOT_USERNAME}"
+            f"**Bot Name: @{BOT_USERNAME}**"
         )
 
         keyboard = InlineKeyboardMarkup([
             [InlineKeyboardButton("Add me in your group", url=f"https://t.me/{BOT_USERNAME}?startgroup=true")]
         ])
-
         await client.send_message(OTHER_LOGS, log_text, reply_markup=keyboard)
 
+        # Notification to user
         user_notice_keyboard = InlineKeyboardMarkup([
-            [InlineKeyboardButton("Close", callback_data="close")]
+            [InlineKeyboardButton("View Your Edit Logs", url="https://t.me/Copyright_logs")]
         ])
-        await message.reply(
+        sent_msg = await message.reply(
             f"Hey {message.from_user.mention},\n"
             f"You edited a message, so I deleted it.\n\n"
-            f"To turn this feature on|off, use /edit\n"
-            f"Check Your Logs: [Your Logs](https://t.me/Copyright_logs)",
+            f"To turn this feature on|off, use /edit",
             reply_markup=user_notice_keyboard
         )
+        await asyncio.sleep(10)
+        try:
+            await sent_msg.delete()
+        except:
+            pass
+
     except Exception as e:
         print(f"[EditDelete Error] {e}")
