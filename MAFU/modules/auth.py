@@ -52,7 +52,8 @@ async def authlist_handler(client, message: Message):
         return await message.reply("❌ Only group owner or admins can use this command!")
 
     chat_id = message.chat.id
-    users = await get_auth_users(chat_id)
+    data = await get_auth_users(chat_id)
+    users = data.get("auth_users", [])
 
     if not users:
         return await message.reply("⚠️ No users have been authorized in this group.")
