@@ -3,7 +3,7 @@ from pyrogram.types import InlineKeyboardMarkup, InlineKeyboardButton, Message, 
 from MAFU.helper.database import get_users, get_chats, get_new_users, get_new_chats
 from MAFU import MAFU as app
 
-@Client.on_message(filters.command("stats") & filters.private)
+@app.on_message(filters.command("stats") & filters.private)
 async def stats(_, message: Message):
     users_data = await get_users()
     chats_data = await get_chats()
