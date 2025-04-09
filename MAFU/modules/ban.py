@@ -57,7 +57,7 @@ async def extract_user_and_reason(message, client):
     return user.id, user.first_name, reason
 
 # Ban Command
-@app.on_message(filters.command("ban"))
+@app.on_message(filters.command("ban", prefixes=["/", "!", "%", ",", ".", "@", "#"]))
 @is_admins
 async def ban_user(client, message):
     user_id, first_name, reason = await extract_user_and_reason(message, client)
@@ -83,7 +83,7 @@ async def ban_user(client, message):
         await message.reply_text("I need admin rights to ban users.")
 
 # Unban Command
-@app.on_message(filters.command("unban"))
+@app.on_message(filters.command("unban", prefixes=["/", "!", "%", ",", ".", "@", "#"]))
 @is_admins
 async def unban_user(client, message):
     user_id, first_name, _ = await extract_user_and_reason(message, client)
