@@ -1,6 +1,7 @@
 from pyrogram import Client, filters
 from pyrogram.types import Message, InlineKeyboardMarkup, InlineKeyboardButton, CallbackQuery
 import asyncio
+from MAFU import MAFU as app
 
 @app.on_message(filters.command("test"))
 async def test_cmd(_, message: Message):
