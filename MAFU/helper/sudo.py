@@ -23,10 +23,10 @@ async def is_sudo(user_id: int) -> bool:
     """Check if a user is in sudo list."""
     return bool(await sudodb.find_one({"user_id": user_id}))
 
-# GET ALL SUDOERS
-async def get_sudoers() -> dict:
+# GET ALL SUDOERS (FIXED)
+async def get_sudoers() -> list:
     """Get a list of all sudo users."""
     sudo_list = []
     async for user in sudodb.find({}):
         sudo_list.append(user["user_id"])
-    return {"sudoers": sudo_list}
+    return sudo_list  # FIX: just return the list, not a dict
