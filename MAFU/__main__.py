@@ -3,18 +3,17 @@ import importlib
 from pyrogram import idle
 from MAFU import MAFU
 from MAFU.modules import ALL_MODULES
-
-LOGGER_ID = -1002090474484
+from config import LOGGER_ID, BOT_USERNAME
 
 loop = asyncio.get_event_loop()
 
 async def roy_bot():
     for all_module in ALL_MODULES:
         importlib.import_module("MAFU.modules." + all_module)
-    print("♥︎ B𝗈𝗍 Started Successfully.")
+    print("• {BOT_USERNAME} B𝗈𝗍 Started Successfully.")
     await idle()
-    print("♥︎ Don't edit baby, otherwise you get an error. @ALL_SANATANI_BOT")
-    await MAFU.send_message(LOGGER_ID, "**✦ ɪ ᴀᴍ ᴀʟɪᴠᴇ ʙᴀʙʏ.\n\n✦ ᴊᴏɪɴ - @II_4ST_OFFICIAL_II**")
+    print("♥︎ Don't edit baby, otherwise you get an error: @Copyright_Community")
+    await MAFU.send_message(LOGGER_ID, "**✦ ɪ ᴀᴍ ᴀʟɪᴠᴇ ʙᴀʙʏ.\n\n✦ ᴊᴏɪɴ - @SANATANI_TECH**")
 
 if __name__ == "__main__":
     loop.run_until_complete(roy_bot())
