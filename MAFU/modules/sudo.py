@@ -58,11 +58,12 @@ async def delsudo_cmd(client, message):
     await message.reply(f"Do you want to remove `{user_id}` from the SUDO list?", reply_markup=keyboard)
 
 
-@app.on_callback_query(filters.regex(r"^confirm_sudo:(\d+):(yes|no)$"))
+@app.on_callback_query(filters.regex(r"^confirm_sudo:\d+:(yes|no)$"))
 async def confirm_sudo_callback(client, callback_query: CallbackQuery):
     try:
-        data_parts = callback_query.data.split(":")
-        msg_id, decision = data_parts[1], data_parts[2]
+        _, msg_id, decision = callback_query.data.split(":")  # safely split parts
+        if not msg_id.isdigit():
+            return await callback_query.answer("Invalid confirmation ID.", show_alert=True)
 
         if callback_query.from_user.id != OWNER_ID:
             return await callback_query.answer("Only the OWNER can confirm this action!", show_alert=True)
@@ -84,8 +85,8 @@ async def confirm_sudo_callback(client, callback_query: CallbackQuery):
             await callback_query.message.edit_text("❌ Action cancelled.")
 
     except Exception as e:
-        print(f"Error in confirm_sudo_callback: {e}")
-        return await callback_query.answer("An error occurred!", show_alert=True)
+        print(f"[ERROR] confirm_sudo_callback: {e}")
+        await callback_query.answer("Something went wrong!", show_alert=True)
 
 
 @app.on_message(filters.command("sudolist") & filters.user(OWNER_ID))
