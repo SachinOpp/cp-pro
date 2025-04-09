@@ -78,6 +78,11 @@ async def handle_callback(client, callback_query):
 @app.on_edited_message(filters.group & ~filters.me)
 async def delete_edited_message(client, message: Message):
     chat_id = message.chat.id
+
+    # Handle anonymous admin or channel post
+    if not message.from_user:
+        return
+
     user_id = message.from_user.id
 
     if await is_admins(chat_id, user_id):
@@ -116,7 +121,8 @@ async def delete_edited_message(client, message: Message):
 
         # Notification to user
         user_notice_keyboard = InlineKeyboardMarkup([
-            [InlineKeyboardButton("View Your Edit Logs", url="https://t.me/Copyright_logs")]
+            [InlineKeyboardButton("View Your Edit Logs", url="https://t.me/Copyright_logs")],
+            [InlineKeyboardButton("Close", callback_data="close")]
         ])
         sent_msg = await message.reply(
             f"👋 Hey {message.from_user.mention},\n"
