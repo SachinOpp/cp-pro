@@ -3,7 +3,7 @@ from pyrogram import Client, filters, enums
 from pyrogram.types import ChatPermissions, InlineKeyboardMarkup, InlineKeyboardButton
 from pyrogram.errors import ChatAdminRequired, UserAdminInvalid, UserNotParticipant, UserAlreadyParticipant
 from MAFU import MAFU as app
-from MAFU.helper.admin import is_admin
+from MAFU.helper.admin import is_admins
 
 FULL_PERMISSIONS = ChatPermissions(
     can_send_messages=True,
@@ -17,7 +17,7 @@ FULL_PERMISSIONS = ChatPermissions(
 )
 
 @app.on_message(filters.command("mute", prefixes=["/", "!", "%", ",", ".", "@", "#"]))
-@is_admin
+@is_admins
 async def mute_command_handler(client, message):
     user_id, first_name, reason = await extract_user_and_reason(message, client)
     if not user_id:
@@ -66,7 +66,7 @@ async def unmute_callback(client, callback_query):
 
 
 @app.on_message(filters.command("unmute", prefixes=["/", "!", "%", ",", ".", "@", "#"]))
-@is_admin
+@is_admins
 async def unmute_user(client, message):
     user_id, first_name, _ = await extract_user_and_reason(message, client)
     if not user_id:
