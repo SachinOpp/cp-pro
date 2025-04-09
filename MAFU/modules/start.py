@@ -16,11 +16,10 @@ START_BUTTONS = InlineKeyboardMarkup([
     [InlineKeyboardButton("• ᴏᴡɴᴇʀ •", user_id=config.OWNER_ID)]
 ])
 
-
 # /start command
 @app.on_message(filters.command("start"))
 async def start_command(client, message: Message):
-    if message.chat.type != "private":
+    if str(message.chat.type).lower() != "private":
         return await message.reply(
             "**ᴜsᴇ ᴛʜɪs ᴄᴏᴍᴍᴀɴᴅ ɪɴ ᴍʏ ᴘʀɪᴠᴀᴛᴇ ᴄʜᴀᴛ.**",
             reply_markup=InlineKeyboardMarkup([
@@ -34,11 +33,10 @@ async def start_command(client, message: Message):
         reply_markup=START_BUTTONS
     )
 
-
 # /help command
 @app.on_message(filters.command("help"))
 async def help_command(client, message: Message):
-    if message.chat.type != "private":
+    if str(message.chat.type).lower() != "private":
         return await message.reply(
             "**ʜᴇʟᴘ ᴄᴏᴍᴍᴀɴᴅ ɪs ᴏɴʟʏ ᴀᴠᴀɪʟᴀʙʟᴇ ɪɴ ᴅᴍ.**",
             reply_markup=InlineKeyboardMarkup([
@@ -56,7 +54,7 @@ async def help_command(client, message: Message):
         ])
     )
 
-
+# help menu via button
 @app.on_callback_query(filters.regex("show_help"))
 async def show_help(_, query: CallbackQuery):
     await query.message.edit_caption(
@@ -69,7 +67,7 @@ async def show_help(_, query: CallbackQuery):
         ])
     )
 
-
+# about menu via button
 @app.on_callback_query(filters.regex("show_about"))
 async def show_about(_, query: CallbackQuery):
     await query.message.edit_caption(
@@ -79,7 +77,7 @@ async def show_about(_, query: CallbackQuery):
         ])
     )
 
-
+# back to start menu
 @app.on_callback_query(filters.regex("go_back"))
 async def go_back(_, query: CallbackQuery):
     await query.message.edit_caption(
