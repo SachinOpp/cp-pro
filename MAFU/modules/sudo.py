@@ -86,11 +86,12 @@ async def confirm_sudo_callback(client, callback_query: CallbackQuery):
         await callback_query.message.edit_text("❌ Action cancelled.")
 
 
-@app.on_message(filters.command("sudolist"))
+@app.on_message(filters.command("sudolist") & filters.user(OWNER_ID))
 async def sudolist_cmd(client, message: Message):
     sudoers = await get_sudoers()
-    
-    if message.from_user.id not in sudoers:
+
+    # Owner को bypass करो
+    if message.from_user.id != OWNER_ID and message.from_user.id not in sudoers:
         return await message.reply("❌ You are not authorized to view the SUDO list.")
     
     if not sudoers:
