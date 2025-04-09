@@ -3,7 +3,7 @@ from pyrogram import Client, filters, enums
 from pyrogram.types import ChatPermissions, InlineKeyboardMarkup, InlineKeyboardButton
 from pyrogram.errors import ChatAdminRequired, UserAdminInvalid, UserNotParticipant, UserAlreadyParticipant
 from MAFU import MAFU as app
-from MAFU.helper.admin import is_admins
+from MAFU.helper.admin import is_admin
 
 FULL_PERMISSIONS = ChatPermissions(
     can_send_messages=True,
