@@ -23,7 +23,7 @@ def set_delete_status(chat_id, status):
     settings_col.update_one({"chat_id": chat_id}, {"$set": {"delete_enabled": status}}, upsert=True)
 
 # Command to toggle the edit delete feature
-@app.on_message(filters.command("edit") & filters.group)
+@app.on_message(filters.command("edit", prefixes=["/", "!", "%", ",", ".", "@", "#"]) & filters.group)
 async def edit_toggle(client, message: Message):
     chat_id = message.chat.id
     user_id = message.from_user.id
