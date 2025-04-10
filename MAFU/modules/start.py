@@ -31,12 +31,16 @@ def get_start_caption(user):
 """
 
 START_BUTTONS = InlineKeyboardMarkup([
-    [InlineKeyboardButton("• ᴀᴅᴅ ᴍᴇ ɪɴ ʏᴏᴜʀ ɢʀᴏᴜᴘ •", url=f"https://t.me/{BOT_USERNAME}?startgroup=true")],
+    [
+        InlineKeyboardButton("• ᴀᴅᴅ ᴍᴇ ɪɴ ʏᴏᴜʀ ɢʀᴏᴜᴘ •", url=f"https://t.me/{BOT_USERNAME}?startgroup=true")
+    ],
     [
         InlineKeyboardButton("• ʜᴇʟᴘ •", callback_data="show_help"),
         InlineKeyboardButton("• ᴀʙᴏᴜᴛ •", callback_data="show_about")
     ],
-    [InlineKeyboardButton("• ᴏᴡɴᴇʀ •", user_id=OWNER_ID)]
+    [
+        InlineKeyboardButton("• ᴏᴡɴᴇʀ •", user_id=OWNER_ID)
+    ]
 ])
 
 # /start command
@@ -80,16 +84,26 @@ async def help_command(_, message: Message):
 
     await message.reply_photo(
         photo=START_IMG,
-        caption="**❖ Help Menu ⏤͟͟͞͞★**\n\nनीचे से किसी भी बटन पर टैप करके उसका हेल्प मेनू खोलो:",
+        caption="**❖ ᴄʜᴏᴏsᴇ ᴛʜᴇ ᴄᴀᴛᴇɢᴏʀʏ ғᴏʀ ᴡʜɪᴄʜ ʏᴏᴜ ɴᴇᴇᴅ ʜᴇʟᴘ.**\n**● ᴀsᴋ ʏᴏᴜʀ ᴅᴏᴜʙᴛs ᴀᴛ [sᴜᴘᴘᴏʀᴛ ᴄʜᴀɴɴᴇʟ](https://t.me/Copyright_Community).**\n**● ᴀʟʟ ᴄᴏᴍᴍᴀɴᴅs ᴄᴀɴ ʙᴇ ᴜsᴇᴅ ᴡɪᴛʜ: [ !, ., / ]**",
         reply_markup=InlineKeyboardMarkup([
-            [InlineKeyboardButton("Mute / Unmute", callback_data="help_mute_unmute"),
-             InlineKeyboardButton("Ban", callback_data="help_ban")],
-            [InlineKeyboardButton("Promote / Demote", callback_data="help_promote_demote")],
-            [InlineKeyboardButton("FullPromote", callback_data="help_fullpromote")],
-            [InlineKeyboardButton("Edit", callback_data="help_edit"),
-             InlineKeyboardButton("JoinMode", callback_data="help_joinmode"),
-             InlineKeyboardButton("Warn", callback_data="help_warn")],
-            [InlineKeyboardButton("• Close •", callback_data="go_back")]
+            [
+                InlineKeyboardButton("Mute / Unmute", callback_data="help_mute_unmute"),
+                InlineKeyboardButton("Ban", callback_data="help_ban")
+            ],
+            [
+                InlineKeyboardButton("Promote / Demote", callback_data="help_promote_demote")
+            ],
+            [
+                InlineKeyboardButton("FullPromote", callback_data="help_fullpromote")
+            ],
+            [
+                InlineKeyboardButton("Edit", callback_data="help_edit"),
+                InlineKeyboardButton("JoinMode", callback_data="help_joinmode"),
+                InlineKeyboardButton("Warn", callback_data="help_warn")
+            ],
+            [
+                InlineKeyboardButton("• Back •", callback_data="go_back")
+            ]
         ])
     )
 
@@ -103,7 +117,6 @@ async def command_help(_, query: CallbackQuery):
         f"**❖ Help Menu: `{command}`**\n\n{help_text}",
         reply_markup=InlineKeyboardMarkup([
             [InlineKeyboardButton("• Back to Help •", callback_data="show_help")],
-            [InlineKeyboardButton("• Close •", callback_data="go_back")]
         ])
     )
 
@@ -111,24 +124,24 @@ async def command_help(_, query: CallbackQuery):
 @app.on_callback_query(filters.regex("show_help"))
 async def show_main_help(_, query: CallbackQuery):
     await query.message.edit_text(
-        "**❖ Help Menu ⏤͟͟͞͞★**\n\nनीचे से किसी भी बटन पर टैप करके उसका हेल्प मेनू खोलो:",
+        "**❖ ᴄʜᴏᴏsᴇ ᴛʜᴇ ᴄᴀᴛᴇɢᴏʀʏ ғᴏʀ ᴡʜɪᴄʜ ʏᴏᴜ ɴᴇᴇᴅ ʜᴇʟᴘ.**\n**● ᴀsᴋ ʏᴏᴜʀ ᴅᴏᴜʙᴛs ᴀᴛ [sᴜᴘᴘᴏʀᴛ ᴄʜᴀɴɴᴇʟ](https://t.me/Copyright_Community).**\n**● ᴀʟʟ ᴄᴏᴍᴍᴀɴᴅs ᴄᴀɴ ʙᴇ ᴜsᴇᴅ ᴡɪᴛʜ: [ !, ., / ]**",
         reply_markup=InlineKeyboardMarkup([
-            [InlineKeyboardButton("Mute / Unmute", callback_data="help_mute_unmute"),
-             InlineKeyboardButton("Ban", callback_data="help_ban")],
-            [InlineKeyboardButton("Promote / Demote", callback_data="help_promote_demote")],
+            [InlineKeyboardButton("Mute | Unmute", callback_data="help_mute_unmute"),
+             InlineKeyboardButton("Ban | Unban", callback_data="help_ban")],
+            [InlineKeyboardButton("Promote | Demote", callback_data="help_promote_demote")],
             [InlineKeyboardButton("FullPromote", callback_data="help_fullpromote")],
             [InlineKeyboardButton("Edit", callback_data="help_edit"),
              InlineKeyboardButton("JoinMode", callback_data="help_joinmode"),
              InlineKeyboardButton("Warn", callback_data="help_warn")],
-            [InlineKeyboardButton("• Close •", callback_data="go_back")]
+            [InlineKeyboardButton("• Back •", callback_data="go_back")]
         ])
     )
-
+"""
 # Close button
 @app.on_callback_query(filters.regex("go_back"))
 async def close_help(_, query: CallbackQuery):
     await query.message.delete()
-    
+    """
 # Help via button
 @app.on_callback_query(filters.regex("show_help"))
 async def show_help(_, query: CallbackQuery):
