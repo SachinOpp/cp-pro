@@ -108,14 +108,19 @@ async def unmute_callback(client, callback_query):
         user = await client.get_users(user_id)
         mention = f"[{user.first_name}](tg://user?id={user.id})"
 
-        await client.restrict_chat_member(chat_id, user_id, FULL_PERMISSIONS)
+        await client.restrict_chat_member(
+            chat_id,
+            user_id,
+            FULL_PERMISSIONS,
+            until_date=0
+        )
         await callback_query.message.edit_text(
             f"{mention} User unmuted successfully.",
             reply_markup=InlineKeyboardMarkup([[InlineKeyboardButton("Close", callback_data="close")]]),
             disable_web_page_preview=True
         )
-    except Exception:
-        await callback_query.answer("Failed to unmute the user!", show_alert=True)
+    except Exception as e:
+        print(f"Unmute failed: {e}")
 
 # =================== UNMUTE BY COMMAND ===================
 @app.on_message(filters.command("unmute", prefixes=["/", "!", "%", ",", ".", "@", "#"]))
