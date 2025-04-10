@@ -1,199 +1,166 @@
 from pyrogram import Client, filters, enums
-from pyrogram.types import ChatPermissions, InlineKeyboardMarkup, InlineKeyboardButton
-from pyrogram.errors import ChatAdminRequired, UserNotParticipant
+from pyrogram.types import InlineKeyboardMarkup, InlineKeyboardButton
+from pyrogram.errors import ChatAdminRequired
 from functools import wraps
-from MAFU import MAFU as app
-from config import OTHER_LOGS
 
-FULL_PERMISSIONS = ChatPermissions(
-    can_send_messages=True,
-    can_send_media_messages=True,
-    can_send_polls=True,
-    can_send_other_messages=True,
-    can_add_web_page_previews=True,
-    can_invite_users=True,
-    can_pin_messages=False
-)
+from MAFU import MAFU as app  # Your client name
+from config import OTHER_LOGS  # Logger Chat ID
 
-MUTE_PERMISSIONS = ChatPermissions()
 
+# Mention Helper
 def mention(user_id, name):
     return f"[{name}](tg://user?id={user_id})"
 
-# Decorator to check if command user is admin
+
+# Admin Check Decorator
 def is_admins(func):
     @wraps(func)
     async def wrapper(client, message, *args, **kwargs):
         try:
             user = await client.get_chat_member(message.chat.id, message.from_user.id)
             if user.status not in [enums.ChatMemberStatus.ADMINISTRATOR, enums.ChatMemberStatus.OWNER]:
-                return await message.reply_text("❌ You need to be an admin to use this command.")
-        except:
-            return await message.reply_text("⚠️ Failed to check admin status.")
+                return await message.reply_text("You need to be an admin to use this command.")
+        except Exception:
+            return await message.reply_text("Failed to check admin status.")
         return await func(client, message, *args, **kwargs)
     return wrapper
 
-# Check if target user is admin
-async def is_admin(client, chat_id, user_id):
-    try:
-        member = await client.get_chat_member(chat_id, user_id)
-        return member.status in ("administrator", "creator")
-    except:
-        return False
 
-# Check if user is already muted
-async def is_muted(client, chat_id, user_id):
-    try:
-        perms = (await client.get_chat_member(chat_id, user_id)).privileges
-        return perms is None or not perms.can_send_messages
-    except:
-        return False
-
-# Extract user and reason
+# Extract User & Reason
 async def extract_user_and_reason(message, client):
-    user_id = None
-    first_name = None
+    args = message.text.split(maxsplit=2)
+    user = None
     reason = None
 
     if message.reply_to_message:
         user = message.reply_to_message.from_user
-        user_id = user.id
-        first_name = user.first_name
-        reason = message.text.split(None, 1)[1] if len(message.command) > 1 else None
-
-    elif len(message.command) >= 2:
-        user_identifier = message.command[1]
-        reason = " ".join(message.command[2:]) if len(message.command) > 2 else None
-
+        if len(args) > 1:
+            reason = args[1]
+    elif len(args) > 1:
+        user_arg = args[1]
+        reason = args[2] if len(args) > 2 else None
         try:
-            user = await client.get_users(user_identifier)
-            user_id = user.id
-            first_name = user.first_name
+            user = await client.get_users(user_arg)
         except Exception:
-            await message.reply_text(f"⚠️ Cannot find user: `{user_identifier}`")
+            await message.reply_text("User not found!")
             return None, None, None
-    else:
-        await message.reply_text("⚠️ Please reply to a user or use /mute @username.")
+
+    if not user:
+        await message.reply_text("Reply to a user or mention one!")
         return None, None, None
 
-    return user_id, first_name, reason
+    try:
+        member = await client.get_chat_member(message.chat.id, user.id)
+    except Exception:
+        pass
+    else:
+        if member.status in [enums.ChatMemberStatus.ADMINISTRATOR, enums.ChatMemberStatus.OWNER]:
+            await message.reply_text("You can't mute an admin!")
+            return None, None, None
 
-# MUTE COMMAND
-@app.on_message(filters.command("mute"))
+    return user.id, user.first_name, reason
+
+
+# Mute Command
+@app.on_message(filters.command("mute", prefixes=["/", "!", "#", ".", "@", ","]))
 @is_admins
-async def mute_command(client, message):
+async def mute_user(client, message):
     user_id, first_name, reason = await extract_user_and_reason(message, client)
     if not user_id:
         return
 
-    if await is_admin(client, message.chat.id, user_id):
-        return await message.reply("⚠️ You cannot mute an admin!")
-
-    if await is_muted(client, message.chat.id, user_id):
-        return await message.reply(f"⚠️ {mention(user_id, first_name)} is already muted!")
-
     try:
-        await client.restrict_chat_member(message.chat.id, user_id, MUTE_PERMISSIONS)
-
-        text = (
-            f"**User muted successfully.**\n"
-            f"**By:** {mention(message.from_user.id, message.from_user.first_name)}\n"
-            f"**User:** {mention(user_id, first_name)}"
+        await client.restrict_chat_member(
+            message.chat.id,
+            user_id,
+            permissions=enums.ChatPermissions(),  # No permissions
         )
+        user_mention = mention(user_id, first_name)
+        admin_mention = mention(message.from_user.id, message.from_user.first_name)
+        msg = f"**User Muted Successfully!**\n\n**Muted By:** {admin_mention}\n**User:** {user_mention}"
         if reason:
-            text += f"\n**Reason:** `{reason}`"
+            msg += f"\n**Reason:** `{reason}`"
 
         keyboard = InlineKeyboardMarkup([
             [InlineKeyboardButton("Unmute", callback_data=f"unmute_{user_id}")],
             [InlineKeyboardButton("Close", callback_data="close")]
         ])
-        await message.reply_text(text, reply_markup=keyboard)
 
-        log_msg = (
-            f"**Mute Notification**\n\n"
-            f"**Muted By:** {mention(message.from_user.id, message.from_user.first_name)}\n"
-            f"**User:** {mention(user_id, first_name)}\n"
-            f"**User ID:** `{user_id}`\n"
-            f"**Chat:** `{message.chat.title}`\n"
-            f"**Chat ID:** `{message.chat.id}`"
-        )
+        await message.reply_text(msg, reply_markup=keyboard, disable_web_page_preview=True)
+
+        # Log
+        log_msg = f"**Mute Alert**\n\n**Chat:** {message.chat.title} (`{message.chat.id}`)\n**By:** {admin_mention}\n**User:** {user_mention}"
         if reason:
             log_msg += f"\n**Reason:** `{reason}`"
-
         await client.send_message(OTHER_LOGS, log_msg)
 
     except ChatAdminRequired:
-        await message.reply("❌ I don't have permission to mute users!")
+        await message.reply_text("I need admin rights to mute users.")
 
-# UNMUTE COMMAND
-@app.on_message(filters.command("unmute"))
+
+# Unmute Command
+@app.on_message(filters.command("unmute", prefixes=["/", "!", "#", ".", "@", ","]))
 @is_admins
-async def unmute_command(client, message):
+async def unmute_user(client, message):
     user_id, first_name, _ = await extract_user_and_reason(message, client)
     if not user_id:
         return
 
-    if not await is_muted(client, message.chat.id, user_id):
-        return await message.reply(f"⚠️ {mention(user_id, first_name)} is not muted!")
-
     try:
-        await client.restrict_chat_member(message.chat.id, user_id, FULL_PERMISSIONS)
-        await message.reply(
-            f"{mention(user_id, first_name)} has been unmuted.",
-            reply_markup=InlineKeyboardMarkup([[InlineKeyboardButton("Close", callback_data="close")]])
+        await client.restrict_chat_member(
+            message.chat.id,
+            user_id,
+            permissions=enums.ChatPermissions(
+                can_send_messages=True,
+                can_send_media_messages=True,
+                can_send_other_messages=True,
+                can_add_web_page_previews=True,
+            ),
         )
+        await message.reply_text(f"{mention(user_id, first_name)} has been unmuted!",
+                                 reply_markup=InlineKeyboardMarkup([[InlineKeyboardButton("Close", callback_data="close")]]))
 
-        log_msg = (
-            f"**Unmute Notification (Command)**\n\n"
-            f"**Unmuted By:** {mention(message.from_user.id, message.from_user.first_name)}\n"
-            f"**User:** {mention(user_id, first_name)}\n"
-            f"**User ID:** `{user_id}`\n"
-            f"**Chat:** `{message.chat.title}`\n"
-            f"**Chat ID:** `{message.chat.id}`"
-        )
+        admin_mention = mention(message.from_user.id, message.from_user.first_name)
+        user_mention = mention(user_id, first_name)
+        log_msg = f"**Unmute Alert**\n\n**Chat:** {message.chat.title} (`{message.chat.id}`)\n**By:** {admin_mention}\n**User:** {user_mention}"
         await client.send_message(OTHER_LOGS, log_msg)
 
     except ChatAdminRequired:
-        await message.reply("❌ I don't have permission to unmute users!")
+        await message.reply_text("I need admin rights to unmute users.")
 
-# UNMUTE BUTTON HANDLER
+
+# Unmute Button Callback
 @app.on_callback_query(filters.regex(r"^unmute_(\d+)$"))
-async def unmute_button(client, callback_query):
-    try:
-        user = await client.get_chat_member(callback_query.message.chat.id, callback_query.from_user.id)
-        if user.status not in [enums.ChatMemberStatus.ADMINISTRATOR, enums.ChatMemberStatus.OWNER]:
-            return await callback_query.answer("❌ You must be an admin!", show_alert=True)
-    except:
-        return await callback_query.answer("⚠️ Failed to check admin status.", show_alert=True)
+async def unmute_btn_callback(client, cb):
+    user_id = int(cb.data.split("_")[1])
+    chat_id = cb.message.chat.id
+    admin = cb.from_user
 
-    user_id = int(callback_query.data.split("_")[1])
-    chat_id = callback_query.message.chat.id
-
-    if not await is_muted(client, chat_id, user_id):
-        return await callback_query.answer("⚠️ Already unmuted!", show_alert=True)
+    member = await client.get_chat_member(chat_id, admin.id)
+    if member.status not in [enums.ChatMemberStatus.ADMINISTRATOR, enums.ChatMemberStatus.OWNER]:
+        return await cb.answer("You're not an admin!", show_alert=True)
 
     try:
-        await client.restrict_chat_member(chat_id, user_id, FULL_PERMISSIONS)
-        await callback_query.message.edit_text(
-            f"{mention(user_id, 'User')} has been unmuted.",
+        await client.restrict_chat_member(
+            chat_id,
+            user_id,
+            permissions=enums.ChatPermissions(
+                can_send_messages=True,
+                can_send_media_messages=True,
+                can_send_other_messages=True,
+                can_add_web_page_previews=True,
+            ),
+        )
+        await cb.message.edit_text(
+            "User unmuted successfully!",
             reply_markup=InlineKeyboardMarkup([[InlineKeyboardButton("Close", callback_data="close")]])
         )
 
         user = await client.get_users(user_id)
-        log_msg = (
-            f"**Unmute Notification (Button)**\n\n"
-            f"**Unmuted By:** {mention(callback_query.from_user.id, callback_query.from_user.first_name)}\n"
-            f"**User:** {mention(user_id, user.first_name)}\n"
-            f"**User ID:** `{user_id}`\n"
-            f"**Chat:** `{callback_query.message.chat.title}`\n"
-            f"**Chat ID:** `{chat_id}`"
-        )
+        admin_mention = mention(admin.id, admin.first_name)
+        user_mention = mention(user_id, user.first_name)
+        log_msg = f"**Unmute (Button) Alert**\n\n**Chat:** {cb.message.chat.title} (`{chat_id}`)\n**By:** {admin_mention}\n**User:** {user_mention}"
         await client.send_message(OTHER_LOGS, log_msg)
 
-    except:
-        await callback_query.answer("❌ Failed to unmute!", show_alert=True)
-
-# CLOSE BUTTON HANDLER
-@app.on_callback_query(filters.regex("close"))
-async def close_button(client, callback_query):
-    await callback_query.message.delete()
+    except Exception:
+        await cb.answer("Failed to unmute the user.", show_alert=True)
