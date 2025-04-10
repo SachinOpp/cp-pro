@@ -3,12 +3,7 @@ from config import OWNER_ID
 from pyrogram import *
 from pyrogram.types import *
 from MAFU import MAFU as app
-from MAFU.helper import *
-
-
-
-
-
+from MAFU.helper.database import get_users, get_chats
 
 async def send_msg(user_id, message):
     try:
