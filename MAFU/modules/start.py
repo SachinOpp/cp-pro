@@ -68,7 +68,7 @@ HELP_COMMANDS = {
 }
 
 # /help command
-@Client.on_message(filters.command("help"))
+@app.on_message(filters.command("help"))
 async def help_command(_, message: Message):
     if message.chat.type.name != "PRIVATE":
         return await message.reply(
@@ -94,7 +94,7 @@ async def help_command(_, message: Message):
     )
 
 # Help via callback buttons
-@Client.on_callback_query(filters.regex(r"help_(\w+)"))
+@app.on_callback_query(filters.regex(r"help_(\w+)"))
 async def command_help(_, query: CallbackQuery):
     command = query.matches[0].group(1)
     help_text = HELP_COMMANDS.get(command, "No help found for this command.")
@@ -108,7 +108,7 @@ async def command_help(_, query: CallbackQuery):
     )
 
 # Show main help again
-@Client.on_callback_query(filters.regex("show_help"))
+@app.on_callback_query(filters.regex("show_help"))
 async def show_main_help(_, query: CallbackQuery):
     await query.message.edit_text(
         "**❖ Help Menu ⏤͟͟͞͞★**\n\nनीचे से किसी भी बटन पर टैप करके उसका हेल्प मेनू खोलो:",
@@ -125,7 +125,7 @@ async def show_main_help(_, query: CallbackQuery):
     )
 
 # Close button
-@Client.on_callback_query(filters.regex("go_back"))
+@app.on_callback_query(filters.regex("go_back"))
 async def close_help(_, query: CallbackQuery):
     await query.message.delete()
     
