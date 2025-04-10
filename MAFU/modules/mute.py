@@ -2,20 +2,8 @@ from pyrogram import Client, filters, enums
 from pyrogram.types import ChatPermissions, InlineKeyboardMarkup, InlineKeyboardButton, Message
 from pyrogram.errors import ChatAdminRequired
 from MAFU import MAFU as app
-from config import OTHER_LOGS  # Logger group/channel
+from config import OTHER_LOGS, BOT_USERNAME
 from typing import Tuple, Optional
-
-# =================== ADMIN DECORATOR ===================
-def is_admins(func):
-    async def wrapper(client, message: Message):
-        try:
-            member = await client.get_chat_member(message.chat.id, message.from_user.id)
-            if member.status not in [enums.ChatMemberStatus.ADMINISTRATOR, enums.ChatMemberStatus.OWNER]:
-                return await message.reply_text("Only admins can use this command.")
-        except Exception:
-            return await message.reply_text("Failed to check admin status.")
-        return await func(client, message)
-    return wrapper
 
 # =================== EXTRACT UTILS ===================
 async def extract_user_and_reason(message: Message, client: Client) -> Tuple[Optional[int], Optional[str], Optional[str]]:
@@ -68,7 +56,6 @@ MUTE_PERMISSIONS = ChatPermissions()
 
 # =================== MUTE COMMAND ===================
 @app.on_message(filters.command("mute", prefixes=["/", "!", "%", ",", ".", "@", "#"]))
-@is_admins
 async def mute_command_handler(client, message):
     user_id, first_name, reason = await extract_user_and_reason(message, client)
     if not user_id:
@@ -76,6 +63,7 @@ async def mute_command_handler(client, message):
 
     try:
         await client.restrict_chat_member(message.chat.id, user_id, MUTE_PERMISSIONS)
+        user = await client.get_users(user_id)
         user_mention = mention(user_id, first_name)
         admin_mention = mention(message.from_user.id, message.from_user.first_name)
 
@@ -89,11 +77,23 @@ async def mute_command_handler(client, message):
         ])
         await message.reply_text(msg, reply_markup=keyboard)
 
-        # Send to logs
-        log_msg = f"#MUTE\n\n**Muted by:** {admin_mention}\n**User:** {user_mention}\n**Chat:** `{message.chat.title}`\nChat I'd: `{message.chat.id}`"
+        # Logger
+        user_username = f"@{user.username}" if user.username else "No username"
+        log_keyboard = InlineKeyboardMarkup([[
+            InlineKeyboardButton("Add me in your group", url=f"https://t.me/{BOT_USERNAME}?startgroup=true")
+        ]])
+        log_msg = (
+            f"Mute Notification !\n\n"
+            f"**Muted by:** {admin_mention}\n"
+            f"**User:** {user_mention}\n"
+            f"**Username:** `{user_username}`\n"
+            f"**User ID:** `{user_id}`\n"
+            f"**Chat:** `{message.chat.title}`\n"
+            f"**Chat ID:** `{message.chat.id}`"
+        )
         if reason:
             log_msg += f"\n**Reason:** `{reason}`"
-        await client.send_message(OTHER_LOGS, log_msg)
+        await client.send_message(OTHER_LOGS, log_msg, reply_markup=log_keyboard)
 
     except ChatAdminRequired:
         await message.reply_text(
@@ -108,10 +108,6 @@ async def unmute_callback(client, callback_query):
     chat_id = callback_query.message.chat.id
     from_user = callback_query.from_user  
 
-    chat_member = await client.get_chat_member(chat_id, from_user.id)
-    if chat_member.status not in [enums.ChatMemberStatus.ADMINISTRATOR, enums.ChatMemberStatus.OWNER]:
-        return await callback_query.answer("You are not an admin!", show_alert=True)
-
     try:
         await client.restrict_chat_member(chat_id, user_id, FULL_PERMISSIONS)
         await callback_query.message.edit_text(
@@ -119,17 +115,27 @@ async def unmute_callback(client, callback_query):
             reply_markup=InlineKeyboardMarkup([[InlineKeyboardButton("Close", callback_data="close")]])
         )
 
-        # Log message
         user = await client.get_users(user_id)
-        log_msg = f"#UNMUTE\n\n**Unmuted by:** {mention(from_user.id, from_user.first_name)}\n**User:** {mention(user_id, user.first_name)}\n**Chat:** `{callback_query.message.chat.title}`\nChat I'd: `{chat_id}`"
-        await client.send_message(OTHER_LOGS, log_msg)
+        user_username = f"@{user.username}" if user.username else "No username"
+        log_keyboard = InlineKeyboardMarkup([[
+            InlineKeyboardButton("Add me in your group", url=f"https://t.me/{BOT_USERNAME}?startgroup=true")
+        ]])
+        log_msg = (
+            f"Unmute Notification !\n\n"
+            f"**Unmuted by:** {mention(from_user.id, from_user.first_name)}\n"
+            f"**User:** {mention(user.id, user.first_name)}\n"
+            f"**Username:** `{user_username}`\n"
+            f"**User ID:** `{user.id}`\n"
+            f"**Chat:** `{callback_query.message.chat.title}`\n"
+            f"**Chat ID:** `{chat_id}`"
+        )
+        await client.send_message(OTHER_LOGS, log_msg, reply_markup=log_keyboard)
 
     except Exception:
         await callback_query.answer("Failed to unmute the user!", show_alert=True)
 
 # =================== UNMUTE BY COMMAND ===================
 @app.on_message(filters.command("unmute", prefixes=["/", "!", "%", ",", ".", "@", "#"]))
-@is_admins
 async def unmute_user(client, message):
     user_id, first_name, _ = await extract_user_and_reason(message, client)
     if not user_id:
@@ -142,9 +148,21 @@ async def unmute_user(client, message):
             reply_markup=InlineKeyboardMarkup([[InlineKeyboardButton("Close", callback_data="close")]])
         )
 
-        # Send to logs
-        log_msg = f"#UNMUTE\n\n**Unmuted by:** {mention(message.from_user.id, message.from_user.first_name)}\n**User:** {mention(user_id, first_name)}\n**Chat:** `{message.chat.title}`\nChat I'd: `{message.chat.id}`"
-        await client.send_message(OTHER_LOGS, log_msg)
+        user = await client.get_users(user_id)
+        user_username = f"@{user.username}" if user.username else "No username"
+        log_keyboard = InlineKeyboardMarkup([[
+            InlineKeyboardButton("Add me in your group", url=f"https://t.me/{BOT_USERNAME}?startgroup=true")
+        ]])
+        log_msg = (
+            f"Unmute Notification !\n\n"
+            f"**Unmuted by:** {mention(message.from_user.id, message.from_user.first_name)}\n"
+            f"**User:** {mention(user_id, first_name)}\n"
+            f"**Username:** `{user_username}`\n"
+            f"**User ID:** `{user_id}`\n"
+            f"**Chat:** `{message.chat.title}`\n"
+            f"**Chat ID:** `{message.chat.id}`"
+        )
+        await client.send_message(OTHER_LOGS, log_msg, reply_markup=log_keyboard)
 
     except ChatAdminRequired:
         await message.reply_text(
