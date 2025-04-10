@@ -1,5 +1,11 @@
 from pyrogram import filters
-from pyrogram.types import InlineKeyboardButton, InlineKeyboardMarkup, Message
+from pyrogram.types import (
+    InlineKeyboardMarkup,
+    InlineKeyboardButton,
+    CallbackQuery,
+    InputMediaPhoto,
+    Message,
+)
 from config import OWNER_ID, BOT_USERNAME
 from MAFU import MAFU as app
 from MAFU.helper.database import add_user, add_chat
@@ -14,8 +20,7 @@ def get_start_caption(user, bot):
 ɪ'ᴍ [{BOT_USERNAME}](https://t.me/{BOT_USERNAME}) – ʏᴏᴜʀ ʟᴏʏᴀʟ ᴀɪ ɢᴜᴀʀᴅ ʀᴇᴀᴅʏ ᴛᴏ ꜱᴇʀᴠᴇ ʏᴏᴜ!
 
 ɪ ᴄᴀɴ:
-• ꜱᴛᴏᴘ ꜱᴘᴀᴍᴍᴇʀꜱ
-• ꜱᴇɴᴅ ᴡᴀʀɴɪɴɢꜱ
+• ꜱᴛᴏᴘ ꜱᴘᴀᴍᴍᴇʀꜱ • ꜱᴇɴᴅ ᴡᴀʀɴɪɴɢꜱ
 • ᴅᴇꜰᴇɴᴅ ʏᴏᴜʀ ɢʀᴏᴜᴘ
 • ᴀɴᴅ ᴇᴠᴇɴ ᴡʜɪꜱᴘᴇʀ ꜱᴇᴄʀᴇᴛꜱ...
 
@@ -23,6 +28,9 @@ def get_start_caption(user, bot):
 
 **— ᴡɪᴛʜ ʟᴏᴠᴇ, ʏᴏᴜʀ ᴠɪʀᴛᴜᴀʟ ᴘʀᴏᴛᴇᴄᴛᴏʀ**
 """
+
+# Used in callbacks
+START_CAPTION = get_start_caption("User", BOT_USERNAME)
 
 START_BUTTONS = InlineKeyboardMarkup([
     [InlineKeyboardButton("• ᴀᴅᴅ ᴍᴇ ɪɴ ʏᴏᴜʀ ɢʀᴏᴜᴘ •", url=f"https://t.me/{BOT_USERNAME}?startgroup=true")],
@@ -49,19 +57,6 @@ async def start_command(_, message: Message):
         return await message.reply(
             "**ᴛʜᴀɴᴋꜱ ꜰᴏʀ ᴀᴅᴅɪɴɢ ᴍᴇ!**\n\nɪ'ᴍ ɴᴏᴡ ᴀᴄᴛɪᴠᴇ ɪɴ ᴛʜɪꜱ ɢʀᴏᴜᴘ ᴀɴᴅ ʀᴇᴀᴅʏ ᴛᴏ ᴘʀᴏᴛᴇᴄᴛ."
         )
-
-# /help command
-from pyrogram import filters
-from pyrogram.types import (
-    InlineKeyboardMarkup,
-    InlineKeyboardButton,
-    CallbackQuery,
-    Message,
-)
-from config import BOT_USERNAME
-from MAFU import MAFU as app
-
-START_IMG = "https://files.catbox.moe/jhlnjc.jpg"
 
 HELP_TEXT = (
     "**❖ Help Menu ⏤͟͟͞͞★**\n\n"
@@ -94,12 +89,15 @@ async def help_command(_, message: Message):
             [InlineKeyboardButton("• Back •", callback_data="go_back")]
         ])
     )
+
 # Help via button
 @app.on_callback_query(filters.regex("show_help"))
 async def show_help(_, query: CallbackQuery):
     await query.message.edit_media(
-        media=query.message.photo.file_id if query.message.photo else START_IMG,
-        caption=HELP_TEXT,
+        media=InputMediaPhoto(
+            media=START_IMG,
+            caption=HELP_TEXT
+        ),
         reply_markup=InlineKeyboardMarkup([
             [InlineKeyboardButton("• Back •", callback_data="go_back")]
         ])
@@ -111,23 +109,17 @@ async def show_about(_, query: CallbackQuery):
     await query.message.edit_caption(
         "**❖ ᴀʙᴏᴜᴛ ᴍᴇ ⏤͟͟͞͞★\n\nɪ ᴀᴍ ᴀ ᴘᴏᴡᴇʀғᴜʟ ɢʀᴏᴜᴘ ᴘʀᴏᴛᴇᴄᴛɪᴏɴ ʙᴏᴛ ᴡɪᴛʜ ᴀɴᴛɪ-ᴘᴏʀɴ, sᴘᴀᴍ ᴀɴᴅ ᴍᴏʀᴇ**",
         reply_markup=InlineKeyboardMarkup([
-            [InlineKeyboardButton("• ʙᴀᴄᴋ •", callback_data="go_back")]
+            [InlineKeyboardButton("• Back •", callback_data="go_back")]
         ])
     )
 
 # Back to Start
 @app.on_callback_query(filters.regex("go_back"))
 async def go_back(_, query: CallbackQuery):
-    try:
-        await query.message.edit_media(
-            media=InputMediaPhoto(
-                media=START_IMG,
-                caption=START_CAPTION
-            ),
-            reply_markup=START_BUTTONS
-        )
-    except Exception:
-        await query.message.edit_caption(
-            caption=START_CAPTION,
-            reply_markup=START_BUTTONS
-        )
+    await query.message.edit_media(
+        media=InputMediaPhoto(
+            media=START_IMG,
+            caption=START_CAPTION
+        ),
+        reply_markup=START_BUTTONS
+    )
