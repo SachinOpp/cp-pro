@@ -107,7 +107,7 @@ async def unmute_callback(client, callback_query):
     try:
         await client.restrict_chat_member(chat_id, user_id, FULL_PERMISSIONS)
         await callback_query.message.edit_text(
-            "User unmuted successfully.",
+            f"{mention(user_id, first_name)} User unmuted successfully.",
             reply_markup=InlineKeyboardMarkup([[InlineKeyboardButton("Close", callback_data="close")]])
         )
     except Exception:
