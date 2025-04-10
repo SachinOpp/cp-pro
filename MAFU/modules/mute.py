@@ -2,6 +2,7 @@ from pyrogram import Client, filters, enums
 from pyrogram.types import ChatPermissions, InlineKeyboardMarkup, InlineKeyboardButton, Message
 from pyrogram.errors import ChatAdminRequired
 from MAFU import MAFU as app
+from config import OTHER_LOGS  # Logger group/channel
 from typing import Tuple, Optional
 
 # =================== ADMIN DECORATOR ===================
@@ -87,6 +88,13 @@ async def mute_command_handler(client, message):
             [InlineKeyboardButton("Close", callback_data="close")]
         ])
         await message.reply_text(msg, reply_markup=keyboard)
+
+        # Send to logs
+        log_msg = f"#MUTE\n\n**Muted by:** {admin_mention}\n**User:** {user_mention}\n**Chat:** `{message.chat.title}`\nChat I'd: `{message.chat.id}`"
+        if reason:
+            log_msg += f"\n**Reason:** `{reason}`"
+        await client.send_message(OTHER_LOGS, log_msg)
+
     except ChatAdminRequired:
         await message.reply_text(
             "I need to be an admin with mute permissions!",
@@ -110,6 +118,12 @@ async def unmute_callback(client, callback_query):
             "User unmuted successfully.",
             reply_markup=InlineKeyboardMarkup([[InlineKeyboardButton("Close", callback_data="close")]])
         )
+
+        # Log message
+        user = await client.get_users(user_id)
+        log_msg = f"#UNMUTE\n\n**Unmuted by:** {mention(from_user.id, from_user.first_name)}\n**User:** {mention(user_id, user.first_name)}\n**Chat:** `{callback_query.message.chat.title}`\nChat I'd: `{chat_id}`"
+        await client.send_message(OTHER_LOGS, log_msg)
+
     except Exception:
         await callback_query.answer("Failed to unmute the user!", show_alert=True)
 
@@ -127,6 +141,11 @@ async def unmute_user(client, message):
             f"{mention(user_id, first_name)} has been unmuted successfully.",
             reply_markup=InlineKeyboardMarkup([[InlineKeyboardButton("Close", callback_data="close")]])
         )
+
+        # Send to logs
+        log_msg = f"#UNMUTE\n\n**Unmuted by:** {mention(message.from_user.id, message.from_user.first_name)}\n**User:** {mention(user_id, first_name)}\n**Chat:** `{message.chat.title}`\nChat I'd: `{message.chat.id}`"
+        await client.send_message(OTHER_LOGS, log_msg)
+
     except ChatAdminRequired:
         await message.reply_text(
             "I need admin privileges to unmute users!",
