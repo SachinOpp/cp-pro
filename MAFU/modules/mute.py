@@ -1,6 +1,7 @@
 from pyrogram import Client, filters, enums
 from pyrogram.types import InlineKeyboardMarkup, InlineKeyboardButton
 from pyrogram.errors import ChatAdminRequired
+from pyrogram.types import ChatPermissions
 from functools import wraps
 
 from MAFU import MAFU as app  # Your client name
@@ -73,7 +74,7 @@ async def mute_user(client, message):
         await client.restrict_chat_member(
             message.chat.id,
             user_id,
-            permissions=enums.ChatPermissions(),  # No permissions
+            permissions=ChatPermissions()  # No permissions
         )
         user_mention = mention(user_id, first_name)
         admin_mention = mention(message.from_user.id, message.from_user.first_name)
