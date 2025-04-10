@@ -111,7 +111,7 @@ async def unban_btn_callback(client, cb):
     try:
         await client.unban_chat_member(chat_id, user_id)
         await cb.message.edit_text(
-            "User unbanned successfully!",
+            "{mention(user_id, first_name)} User unbanned successfully!",
             reply_markup=InlineKeyboardMarkup([[InlineKeyboardButton("Close", callback_data="close")]])
         )
     except Exception:
