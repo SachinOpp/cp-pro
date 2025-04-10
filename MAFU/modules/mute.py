@@ -105,10 +105,20 @@ async def unmute_callback(client, callback_query):
         return await callback_query.answer("You are not an admin!", show_alert=True)
 
     try:
-        await client.restrict_chat_member(chat_id, user_id, FULL_PERMISSIONS)
+        user = await client.get_users(user_id)
+        mention_text = f"[{user.first_name}](tg://user?id={user.id})"
+        
+        await client.restrict_chat_member(chat_id, user_id, enums.ChatPermissions(
+            can_send_messages=True,
+            can_send_media_messages=True,
+            can_send_other_messages=True,
+            can_add_web_page_previews=True,
+        ))
+
         await callback_query.message.edit_text(
-            f"{mention(user_id, first_name)} User unmuted successfully.",
-            reply_markup=InlineKeyboardMarkup([[InlineKeyboardButton("Close", callback_data="close")]])
+            f"{mention_text} unmuted successfully.",
+            reply_markup=InlineKeyboardMarkup([[InlineKeyboardButton("Close", callback_data="close")]]),
+            disable_web_page_preview=True
         )
     except Exception:
         await callback_query.answer("Failed to unmute the user!", show_alert=True)
