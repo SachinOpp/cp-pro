@@ -4,7 +4,6 @@ from pyrogram.errors import ChatAdminRequired, UserNotParticipant
 from functools import wraps
 
 from MAFU import MAFU as app  # Replace with your Client name
-from config import OTHER_LOGS  # Logger Chat ID
 
 # Mention Function
 def mention(user_id, name):
@@ -80,12 +79,6 @@ async def ban_user(client, message):
 
         await message.reply_text(msg, reply_markup=keyboard, disable_web_page_preview=True)
 
-        # Send log to OTHER_LOGS
-        log_msg = f"**Ban Alert**\n\n**Chat:** {message.chat.title} (`{message.chat.id}`)\n**By:** {admin_mention}\n**User:** {user_mention}"
-        if reason:
-            log_msg += f"\n**Reason:** `{reason}`"
-        await client.send_message(OTHER_LOGS, log_msg)
-
     except ChatAdminRequired:
         await message.reply_text("I need admin rights to ban users.")
 
@@ -101,13 +94,6 @@ async def unban_user(client, message):
         await client.unban_chat_member(message.chat.id, user_id)
         await message.reply_text(f"{mention(user_id, first_name)} has been unbanned!",
                                  reply_markup=InlineKeyboardMarkup([[InlineKeyboardButton("Close", callback_data="close")]]))
-
-        # Send log to OTHER_LOGS
-        admin_mention = mention(message.from_user.id, message.from_user.first_name)
-        user_mention = mention(user_id, first_name)
-        log_msg = f"**Unban Alert**\n\n**Chat:** {message.chat.title} (`{message.chat.id}`)\n**By:** {admin_mention}\n**User:** {user_mention}"
-        await client.send_message(OTHER_LOGS, log_msg)
-
     except ChatAdminRequired:
         await message.reply_text("I need admin rights to unban users.")
 
@@ -128,13 +114,5 @@ async def unban_btn_callback(client, cb):
             "User unbanned successfully!",
             reply_markup=InlineKeyboardMarkup([[InlineKeyboardButton("Close", callback_data="close")]])
         )
-
-        # Send log to OTHER_LOGS
-        user = await client.get_users(user_id)
-        admin_mention = mention(admin.id, admin.first_name)
-        user_mention = mention(user_id, user.first_name)
-        log_msg = f"**Unban (Button) Alert**\n\n**Chat:** {cb.message.chat.title} (`{chat_id}`)\n**By:** {admin_mention}\n**User:** {user_mention}"
-        await client.send_message(OTHER_LOGS, log_msg)
-
     except Exception:
         await cb.answer("Failed to unban the user.", show_alert=True)
