@@ -105,7 +105,16 @@ async def unmute_callback(client, callback_query):
         return await callback_query.answer("You are not an admin!", show_alert=True)
 
     try:
-        user = await client.get_users(user_id)
+        try:
+            user = await client.get_users(user_id)
+        except Exception:
+            return await callback_query.answer("User not found!", show_alert=True)
+
+        try:
+            await client.get_chat_member(chat_id, user_id)
+        except Exception:
+            return await callback_query.answer("User not in group!", show_alert=True)
+
         mention = f"[{user.first_name}](tg://user?id={user.id})"
 
         await client.restrict_chat_member(
