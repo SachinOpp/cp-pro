@@ -1,6 +1,6 @@
 from pyrogram import Client, filters, enums
 from pyrogram.types import ChatPermissions, InlineKeyboardMarkup, InlineKeyboardButton, Message
-from pyrogram.errors import ChatAdminRequired
+from pyrogram.errors import ChatAdminRequired, UserAdminInvalid, UserNotParticipant
 from MAFU import MAFU as app
 from config import OTHER_LOGS, BOT_USERNAME
 from typing import Tuple, Optional
@@ -62,6 +62,10 @@ async def mute_command_handler(client, message):
         return
 
     try:
+        member = await client.get_chat_member(message.chat.id, user_id)
+        if member.restricted and not member.can_send_messages:
+            return await message.reply_text("User is already muted.")
+
         await client.restrict_chat_member(message.chat.id, user_id, MUTE_PERMISSIONS)
         user = await client.get_users(user_id)
         user_mention = mention(user_id, first_name)
@@ -106,9 +110,13 @@ async def mute_command_handler(client, message):
 async def unmute_callback(client, callback_query):
     user_id = int(callback_query.data.split("_")[1])
     chat_id = callback_query.message.chat.id
-    from_user = callback_query.from_user  
+    from_user = callback_query.from_user
 
     try:
+        member = await client.get_chat_member(chat_id, user_id)
+        if not member.restricted or member.can_send_messages:
+            return await callback_query.answer("User is already unmuted!", show_alert=True)
+
         await client.restrict_chat_member(chat_id, user_id, FULL_PERMISSIONS)
         await callback_query.message.edit_text(
             "User unmuted successfully.",
@@ -131,7 +139,7 @@ async def unmute_callback(client, callback_query):
         )
         await client.send_message(OTHER_LOGS, log_msg, reply_markup=log_keyboard)
 
-    except Exception:
+    except Exception as e:
         await callback_query.answer("Failed to unmute the user!", show_alert=True)
 
 # =================== UNMUTE BY COMMAND ===================
@@ -142,6 +150,10 @@ async def unmute_user(client, message):
         return
 
     try:
+        member = await client.get_chat_member(message.chat.id, user_id)
+        if not member.restricted or member.can_send_messages:
+            return await message.reply_text("User is already unmuted.")
+
         await client.restrict_chat_member(message.chat.id, user_id, FULL_PERMISSIONS)
         await message.reply_text(
             f"{mention(user_id, first_name)} has been unmuted successfully.",
