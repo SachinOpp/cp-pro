@@ -1,4 +1,4 @@
-from pyrogram import filters
+from pyrogram import filters, Client
 from pyrogram.types import (
     InlineKeyboardMarkup,
     InlineKeyboardButton,
@@ -9,6 +9,7 @@ from pyrogram.types import (
 from config import OWNER_ID, BOT_USERNAME
 from MAFU import MAFU as app
 from MAFU.helper.database import add_user, add_chat
+
 
 START_IMG = "https://files.catbox.moe/jhlnjc.jpg"
 
@@ -54,12 +55,6 @@ async def start_command(_, message: Message):
         return await message.reply(
             "**ᴛʜᴀɴᴋꜱ ꜰᴏʀ ᴀᴅᴅɪɴɢ ᴍᴇ!**\n\nɪ'ᴍ ɴᴏᴡ ᴀᴄᴛɪᴠᴇ ɪɴ ᴛʜɪꜱ ɢʀᴏᴜᴘ ᴀɴᴅ ʀᴇᴀᴅʏ ᴛᴏ ᴘʀᴏᴛᴇᴄᴛ."
         )
-
-from pyrogram import Client, filters
-from pyrogram.types import InlineKeyboardButton, InlineKeyboardMarkup, CallbackQuery, Message
-
-BOT_USERNAME = "YourBotUsername"  # Change this
-START_IMG = "https://example.com/image.jpg"  # Your bot start/help image
 
 # Help Texts
 HELP_COMMANDS = {
