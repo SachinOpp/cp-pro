@@ -98,21 +98,36 @@ async def unban_user(client, message):
         await message.reply_text("I need admin rights to unban users.")
 
 # Unban Button Callback
+from pyrogram.types import InlineKeyboardMarkup, InlineKeyboardButton, LinkPreviewOptions
+
 @app.on_callback_query(filters.regex(r"^unban_(\d+)$"))
 async def unban_btn_callback(client, cb):
-    user_id = int(cb.data.split("_")[1])
-    chat_id = cb.message.chat.id
-    admin = cb.from_user
-
-    member = await client.get_chat_member(chat_id, admin.id)
-    if member.status not in [enums.ChatMemberStatus.ADMINISTRATOR, enums.ChatMemberStatus.OWNER]:
-        return await cb.answer("You're not an admin!", show_alert=True)
-
     try:
+        user_id = int(cb.data.split("_")[1])
+        chat_id = cb.message.chat.id
+        admin = cb.from_user
+
+        # Check admin status
+        member = await client.get_chat_member(chat_id, admin.id)
+        if member.status not in [enums.ChatMemberStatus.ADMINISTRATOR, enums.ChatMemberStatus.OWNER]:
+            return await cb.answer("You're not an admin!", show_alert=True)
+
+        # Unban the user
         await client.unban_chat_member(chat_id, user_id)
+
+        # Get user for mention
+        user = await client.get_users(user_id)
+        mention = f"[{user.first_name}](tg://user?id={user.id})"
+
+        # Send confirmation
         await cb.message.edit_text(
-            "{mention(user_id, first_name)} User unbanned successfully!",
-            reply_markup=InlineKeyboardMarkup([[InlineKeyboardButton("Close", callback_data="close")]])
+            f"{mention} has been unbanned successfully!",
+            reply_markup=InlineKeyboardMarkup([
+                [InlineKeyboardButton("Close", callback_data="close")]
+            ]),
+            link_preview_options=LinkPreviewOptions(is_disabled=True)
         )
-    except Exception:
+
+    except Exception as e:
+        print(f"Unban error: {e}")
         await cb.answer("Failed to unban the user.", show_alert=True)
