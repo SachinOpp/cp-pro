@@ -98,31 +98,24 @@ async def mute_command_handler(client, message):
 async def unmute_callback(client, callback_query):
     user_id = int(callback_query.data.split("_")[1])
     chat_id = callback_query.message.chat.id
-    from_user = callback_query.from_user
-
-    chat_member = await client.get_chat_member(chat_id, from_user.id)
-    if chat_member.status not in [enums.ChatMemberStatus.ADMINISTRATOR, enums.ChatMemberStatus.OWNER]:
-        return await callback_query.answer("You are not an admin!", show_alert=True)
+    from_user = callback_query.from_user  
 
     try:
-        try:
-            user = await client.get_users(user_id)
-        except Exception:
-            return await callback_query.answer("User not found!", show_alert=True)
+        chat_member = await client.get_chat_member(chat_id, from_user.id)
+        if chat_member.status not in [enums.ChatMemberStatus.ADMINISTRATOR, enums.ChatMemberStatus.OWNER]:
+            return await callback_query.answer("You are not an admin!", show_alert=True)
 
-        try:
-            await client.get_chat_member(chat_id, user_id)
-        except Exception:
-            return await callback_query.answer("User not in group!", show_alert=True)
-
+        # Get user info for mention
+        user = await client.get_users(user_id)
         mention = f"[{user.first_name}](tg://user?id={user.id})"
 
         await client.restrict_chat_member(
             chat_id,
             user_id,
-            FULL_PERMISSIONS,
+            ChatPermissions(can_send_messages=True),
             until_date=0
         )
+
         await callback_query.message.edit_text(
             f"{mention} User unmuted successfully.",
             reply_markup=InlineKeyboardMarkup([[InlineKeyboardButton("Close", callback_data="close")]]),
@@ -130,6 +123,7 @@ async def unmute_callback(client, callback_query):
         )
     except Exception as e:
         print(f"Unmute failed: {e}")
+        await callback_query.answer("Failed to unmute the user.", show_alert=True)
 
 # =================== UNMUTE BY COMMAND ===================
 @app.on_message(filters.command("unmute", prefixes=["/", "!", "%", ",", ".", "@", "#"]))
