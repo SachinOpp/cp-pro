@@ -1,4 +1,5 @@
 from pyrogram import Client, filters, enums
+from pyrogram.enums import ChatMemberStatus
 from pyrogram.types import ChatPermissions, InlineKeyboardMarkup, InlineKeyboardButton, Message
 from pyrogram.errors import ChatAdminRequired
 from MAFU import MAFU as app
