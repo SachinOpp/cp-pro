@@ -1,11 +1,11 @@
-from pyrogram import Client, filters, enums
+from pyrogram import Client, filters
 from pyrogram.types import ChatPermissions, InlineKeyboardMarkup, InlineKeyboardButton, Message
-from pyrogram.errors import ChatAdminRequired, UserAdminInvalid, UserNotParticipant
+from pyrogram.errors import ChatAdminRequired
 from MAFU import MAFU as app
 from config import OTHER_LOGS, BOT_USERNAME
 from typing import Tuple, Optional
 
-# =================== EXTRACT UTILS ===================
+# =================== UTILS ===================
 async def extract_user_and_reason(message: Message, client: Client) -> Tuple[Optional[int], Optional[str], Optional[str]]:
     user_id = None
     first_name = None
@@ -22,14 +22,11 @@ async def extract_user_and_reason(message: Message, client: Client) -> Tuple[Opt
         reason = " ".join(message.command[2:]) if len(message.command) > 2 else None
 
         try:
-            if user_identifier.startswith("@"):
-                user = await client.get_users(user_identifier)
-            else:
-                user = await client.get_users(int(user_identifier))
+            user = await client.get_users(user_identifier)
             user_id = user.id
             first_name = user.first_name
         except Exception:
-            await message.reply_text(f"Can't find this user: `{user_identifier}`")
+            await message.reply_text(f"Cannot find this user: `{user_identifier}`")
             return None, None, None
     else:
         await message.reply_text("Reply to a user or give a username/userid.")
@@ -40,6 +37,7 @@ async def extract_user_and_reason(message: Message, client: Client) -> Tuple[Opt
 
 def mention(user_id: int, name: str) -> str:
     return f"[{name}](tg://user?id={user_id})"
+
 
 # =================== PERMISSIONS ===================
 FULL_PERMISSIONS = ChatPermissions(
@@ -54,9 +52,10 @@ FULL_PERMISSIONS = ChatPermissions(
 
 MUTE_PERMISSIONS = ChatPermissions()
 
-# =================== MUTE COMMAND ===================
-@app.on_message(filters.command("mute", prefixes=["/", "!", "%", ",", ".", "@", "#"]))
-async def mute_command_handler(client, message):
+
+# =================== MUTE ===================
+@app.on_message(filters.command("mute", prefixes=["/", "!", ".", ",", "#", "@", "%"]))
+async def mute_command_handler(client: Client, message: Message):
     user_id, first_name, reason = await extract_user_and_reason(message, client)
     if not user_id:
         return
@@ -68,10 +67,12 @@ async def mute_command_handler(client, message):
 
         await client.restrict_chat_member(message.chat.id, user_id, MUTE_PERMISSIONS)
         user = await client.get_users(user_id)
-        user_mention = mention(user_id, first_name)
-        admin_mention = mention(message.from_user.id, message.from_user.first_name)
 
-        msg = f"**User muted successfully.**\n\n**Muted by:** {admin_mention}\n**User:** {user_mention}"
+        msg = (
+            f"**User muted successfully.**\n"
+            f"**Muted by:** {mention(message.from_user.id, message.from_user.first_name)}\n"
+            f"**User:** {mention(user_id, first_name)}"
+        )
         if reason:
             msg += f"\n**Reason:** `{reason}`"
 
@@ -81,15 +82,12 @@ async def mute_command_handler(client, message):
         ])
         await message.reply_text(msg, reply_markup=keyboard)
 
-        # Logger
+        # Logging
         user_username = f"@{user.username}" if user.username else "No username"
-        log_keyboard = InlineKeyboardMarkup([[
-            InlineKeyboardButton("Add me in your group", url=f"https://t.me/{BOT_USERNAME}?startgroup=true")
-        ]])
         log_msg = (
-            f"Mute Notification !\n\n"
-            f"**Muted by:** {admin_mention}\n"
-            f"**User:** {user_mention}\n"
+            f"**Mute Notification!**\n\n"
+            f"**Muted by:** {mention(message.from_user.id, message.from_user.first_name)}\n"
+            f"**User:** {mention(user_id, first_name)}\n"
             f"**Username:** `{user_username}`\n"
             f"**User ID:** `{user_id}`\n"
             f"**Chat:** `{message.chat.title}`\n"
@@ -97,17 +95,19 @@ async def mute_command_handler(client, message):
         )
         if reason:
             log_msg += f"\n**Reason:** `{reason}`"
+
+        log_keyboard = InlineKeyboardMarkup([[
+            InlineKeyboardButton("Add me in your group", url=f"https://t.me/{BOT_USERNAME}?startgroup=true")
+        ]])
         await client.send_message(OTHER_LOGS, log_msg, reply_markup=log_keyboard)
 
     except ChatAdminRequired:
-        await message.reply_text(
-            "I need to be an admin with mute permissions!",
-            reply_markup=InlineKeyboardMarkup([[InlineKeyboardButton("Close", callback_data="close")]])
-        )
+        await message.reply_text("I need to be admin with permission to restrict members!")
 
-# =================== UNMUTE BY BUTTON ===================
+
+# =================== UNMUTE CALLBACK ===================
 @app.on_callback_query(filters.regex(r"^unmute_(\d+)$"))
-async def unmute_callback(client, callback_query):
+async def unmute_callback(client: Client, callback_query):
     user_id = int(callback_query.data.split("_")[1])
     chat_id = callback_query.message.chat.id
     from_user = callback_query.from_user
@@ -118,18 +118,16 @@ async def unmute_callback(client, callback_query):
             return await callback_query.answer("User is already unmuted!", show_alert=True)
 
         await client.restrict_chat_member(chat_id, user_id, FULL_PERMISSIONS)
+
         await callback_query.message.edit_text(
-            "User unmuted successfully.",
+            f"{mention(user_id, 'User')} unmuted successfully.",
             reply_markup=InlineKeyboardMarkup([[InlineKeyboardButton("Close", callback_data="close")]])
         )
 
         user = await client.get_users(user_id)
         user_username = f"@{user.username}" if user.username else "No username"
-        log_keyboard = InlineKeyboardMarkup([[
-            InlineKeyboardButton("Add me in your group", url=f"https://t.me/{BOT_USERNAME}?startgroup=true")
-        ]])
         log_msg = (
-            f"Unmute Notification !\n\n"
+            f"**Unmute Notification!**\n\n"
             f"**Unmuted by:** {mention(from_user.id, from_user.first_name)}\n"
             f"**User:** {mention(user.id, user.first_name)}\n"
             f"**Username:** `{user_username}`\n"
@@ -137,14 +135,19 @@ async def unmute_callback(client, callback_query):
             f"**Chat:** `{callback_query.message.chat.title}`\n"
             f"**Chat ID:** `{chat_id}`"
         )
+
+        log_keyboard = InlineKeyboardMarkup([[
+            InlineKeyboardButton("Add me in your group", url=f"https://t.me/{BOT_USERNAME}?startgroup=true")
+        ]])
         await client.send_message(OTHER_LOGS, log_msg, reply_markup=log_keyboard)
 
-    except Exception as e:
-        await callback_query.answer("Failed to unmute the user!", show_alert=True)
+    except Exception:
+        await callback_query.answer("Failed to unmute user!", show_alert=True)
 
-# =================== UNMUTE BY COMMAND ===================
-@app.on_message(filters.command("unmute", prefixes=["/", "!", "%", ",", ".", "@", "#"]))
-async def unmute_user(client, message):
+
+# =================== UNMUTE COMMAND ===================
+@app.on_message(filters.command("unmute", prefixes=["/", "!", ".", ",", "#", "@", "%"]))
+async def unmute_user(client: Client, message: Message):
     user_id, first_name, _ = await extract_user_and_reason(message, client)
     if not user_id:
         return
@@ -162,11 +165,8 @@ async def unmute_user(client, message):
 
         user = await client.get_users(user_id)
         user_username = f"@{user.username}" if user.username else "No username"
-        log_keyboard = InlineKeyboardMarkup([[
-            InlineKeyboardButton("Add me in your group", url=f"https://t.me/{BOT_USERNAME}?startgroup=true")
-        ]])
         log_msg = (
-            f"Unmute Notification !\n\n"
+            f"**Unmute Notification!**\n\n"
             f"**Unmuted by:** {mention(message.from_user.id, message.from_user.first_name)}\n"
             f"**User:** {mention(user_id, first_name)}\n"
             f"**Username:** `{user_username}`\n"
@@ -174,10 +174,11 @@ async def unmute_user(client, message):
             f"**Chat:** `{message.chat.title}`\n"
             f"**Chat ID:** `{message.chat.id}`"
         )
+
+        log_keyboard = InlineKeyboardMarkup([[
+            InlineKeyboardButton("Add me in your group", url=f"https://t.me/{BOT_USERNAME}?startgroup=true")
+        ]])
         await client.send_message(OTHER_LOGS, log_msg, reply_markup=log_keyboard)
 
     except ChatAdminRequired:
-        await message.reply_text(
-            "I need admin privileges to unmute users!",
-            reply_markup=InlineKeyboardMarkup([[InlineKeyboardButton("Close", callback_data="close")]])
-        )
+        await message.reply_text("I need admin rights to unmute users!")
