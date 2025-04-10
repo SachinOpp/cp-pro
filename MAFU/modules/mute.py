@@ -19,6 +19,19 @@ MUTE_PERMISSIONS = ChatPermissions()
 def mention(user_id, name):
     return f"[{name}](tg://user?id={user_id})"
 
+# Check if the user has permission to restrict others
+async def can_restrict_members(client, chat_id, user_id):
+    try:
+        member = await client.get_chat_member(chat_id, user_id)
+        if member.status == "creator":
+            return True
+        elif member.status == "administrator":
+            return getattr(member.privileges, "can_restrict_members", False)
+        return False
+    except:
+        return False
+
+# Check if target user is admin
 async def is_admin(client, chat_id, user_id):
     try:
         member = await client.get_chat_member(chat_id, user_id)
@@ -26,6 +39,7 @@ async def is_admin(client, chat_id, user_id):
     except:
         return False
 
+# Extract target user and reason
 async def extract_user_and_reason(message, client):
     user_id = None
     first_name = None
@@ -60,15 +74,15 @@ async def extract_user_and_reason(message, client):
 # MUTE COMMAND
 @app.on_message(filters.command("mute"))
 async def mute_command(client, message):
-    if not await is_admin(client, message.chat.id, message.from_user.id):
-        return await message.reply("❌ You must be an admin to use this command!")
+    if not await can_restrict_members(client, message.chat.id, message.from_user.id):
+        return await message.reply("❌ You must be an admin with 'restrict members' permission to use this command!")
 
     user_id, first_name, reason = await extract_user_and_reason(message, client)
     if not user_id:
         return
 
     if await is_admin(client, message.chat.id, user_id):
-        return await message.reply("⚠️ You cannot mute another admin!")
+        return await message.reply("⚠️ You cannot mute an admin!")
 
     try:
         await client.restrict_chat_member(message.chat.id, user_id, MUTE_PERMISSIONS)
@@ -107,8 +121,8 @@ async def mute_command(client, message):
 # UNMUTE COMMAND
 @app.on_message(filters.command("unmute"))
 async def unmute_command(client, message):
-    if not await is_admin(client, message.chat.id, message.from_user.id):
-        return await message.reply("❌ You must be an admin to use this command!")
+    if not await can_restrict_members(client, message.chat.id, message.from_user.id):
+        return await message.reply("❌ You must be an admin with 'restrict members' permission to use this command!")
 
     user_id, first_name, _ = await extract_user_and_reason(message, client)
     if not user_id:
@@ -138,8 +152,8 @@ async def unmute_command(client, message):
 # UNMUTE BUTTON
 @app.on_callback_query(filters.regex(r"^unmute_(\d+)$"))
 async def unmute_button(client, callback_query):
-    if not await is_admin(client, callback_query.message.chat.id, callback_query.from_user.id):
-        return await callback_query.answer("❌ You are not an admin!", show_alert=True)
+    if not await can_restrict_members(client, callback_query.message.chat.id, callback_query.from_user.id):
+        return await callback_query.answer("❌ You must be an admin with 'restrict members' permission!", show_alert=True)
 
     user_id = int(callback_query.data.split("_")[1])
     chat_id = callback_query.message.chat.id
