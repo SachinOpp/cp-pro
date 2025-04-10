@@ -96,35 +96,45 @@ async def mute_command_handler(client, message):
 # =================== UNMUTE BY BUTTON ===================
 @app.on_callback_query(filters.regex(r"^unmute_(\d+)$"))
 async def unmute_callback(client, callback_query):
-    user_id = int(callback_query.data.split("_")[1])
-    chat_id = callback_query.message.chat.id
-    from_user = callback_query.from_user  
-
     try:
-        chat_member = await client.get_chat_member(chat_id, from_user.id)
+        user_id = int(callback_query.data.split("_")[1])
+        chat_id = callback_query.message.chat.id
+        admin_id = callback_query.from_user.id
+
+        # Check if the person clicking is admin
+        chat_member = await client.get_chat_member(chat_id, admin_id)
         if chat_member.status not in [enums.ChatMemberStatus.ADMINISTRATOR, enums.ChatMemberStatus.OWNER]:
-            return await callback_query.answer("You are not an admin!", show_alert=True)
+            return await callback_query.answer("❖ You are not an admin!", show_alert=True)
 
-        # Get user info for mention
-        user = await client.get_users(user_id)
-        mention = f"[{user.first_name}](tg://user?id={user.id})"
-
+        # Unmute the user (don't set until_date to avoid 'NoneType' error)
         await client.restrict_chat_member(
             chat_id,
             user_id,
-            ChatPermissions(can_send_messages=True),
-            until_date=0
+            ChatPermissions(
+                can_send_messages=True,
+                can_send_media_messages=True,
+                can_send_other_messages=True,
+                can_add_web_page_previews=True
+            )
         )
 
+        # Fetch user details for mention
+        user = await client.get_users(user_id)
+        mention = f"[{user.first_name}](tg://user?id={user.id})"
+
+        # Edit original message
         await callback_query.message.edit_text(
             f"{mention} User unmuted successfully.",
-            reply_markup=InlineKeyboardMarkup([[InlineKeyboardButton("Close", callback_data="close")]]),
+            reply_markup=InlineKeyboardMarkup([
+                [InlineKeyboardButton("Close", callback_data="close")]
+            ]),
             disable_web_page_preview=True
         )
-    except Exception as e:
-        print(f"Unmute failed: {e}")
-        await callback_query.answer("Failed to unmute the user.", show_alert=True)
 
+    except Exception as e:
+        print(f"Unmute error: {e}")
+        await callback_query.answer("❖ Failed to unmute the user!", show_alert=True)
+        
 # =================== UNMUTE BY COMMAND ===================
 @app.on_message(filters.command("unmute", prefixes=["/", "!", "%", ",", ".", "@", "#"]))
 @is_admins
