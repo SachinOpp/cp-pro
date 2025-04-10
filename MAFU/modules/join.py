@@ -88,14 +88,7 @@ async def handle_join_request(client, request: ChatJoinRequest):
 
     await client.send_message(
         request.chat.id,
-        f"🔔 <b>Join Request</b>\n\n"
-        f"👤 <b>Name:</b> {full_name}\n"
-        f"📛 <b>Username:</b> {username}\n"
-        f"🆔 <b>ID:</b> <code>{user.id}</code>\n"
-        f"🔗 <b>Mention:</b> {mention}\n"
-        f"⏰ <b>Time:</b> {current_time}\n"
-        f"📅 <b>Date:</b> {current_date}\n"
-        f"👥 <b>Group:</b> {chat_title}",
+        f"<b>⚠️ New join request from:</b> {mention}",
         reply_markup=InlineKeyboardMarkup([
             [
                 InlineKeyboardButton("✅ Approve", callback_data=f"approve_{user.id}"),
