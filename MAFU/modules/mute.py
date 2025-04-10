@@ -62,7 +62,7 @@ async def mute_command_handler(client: Client, message: Message):
 
     try:
         member = await client.get_chat_member(message.chat.id, user_id)
-        if member.restricted and not member.can_send_messages:
+        if member.can_send_messages is False:
             return await message.reply_text("User is already muted.")
 
         await client.restrict_chat_member(message.chat.id, user_id, MUTE_PERMISSIONS)
@@ -113,7 +113,7 @@ async def unmute_callback(client: Client, callback_query):
 
     try:
         member = await client.get_chat_member(chat_id, user_id)
-        if not member.restricted or member.can_send_messages:
+        if member.can_send_messages is True:
             return await callback_query.answer("User is already unmuted!", show_alert=True)
 
         await client.restrict_chat_member(chat_id, user_id, FULL_PERMISSIONS)
@@ -153,7 +153,7 @@ async def unmute_user(client: Client, message: Message):
 
     try:
         member = await client.get_chat_member(message.chat.id, user_id)
-        if not member.restricted or member.can_send_messages:
+        if member.can_send_messages is True:
             return await message.reply_text("User is already unmuted.")
 
         await client.restrict_chat_member(message.chat.id, user_id, FULL_PERMISSIONS)
