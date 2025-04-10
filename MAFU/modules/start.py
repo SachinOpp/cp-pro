@@ -55,21 +55,25 @@ async def start_command(_, message: Message):
             "**ᴛʜᴀɴᴋꜱ ꜰᴏʀ ᴀᴅᴅɪɴɢ ᴍᴇ!**\n\nɪ'ᴍ ɴᴏᴡ ᴀᴄᴛɪᴠᴇ ɪɴ ᴛʜɪꜱ ɢʀᴏᴜᴘ ᴀɴᴅ ʀᴇᴀᴅʏ ᴛᴏ ᴘʀᴏᴛᴇᴄᴛ."
         )
 
-HELP_TEXT = (
-    "**❖ Help Menu ⏤͟͟͞͞★**\n\n"
-    "● `/start` ➥ Start the bot and check if it's alive.\n"
-    "● `/ping` ➥ Check the bot's response time.\n"
-    "● `/repo` ➥ View the bot's source code.\n"
-    "● `/joinmode` ➥ Configure how new members join.\n"
-    "● `/ban`, `/unban` ➥ Ban or unban users from your group.\n"
-    "● `/mute`, `/unmute` ➥ Mute or unmute group members.\n"
-    "● `/promote`, `/demote`, `/fullpromote` ➥ Change user roles in your group.\n"
-    "● `/edit` ➥ Edit a previously sent message.\n"
-    "● `/biobot` ➥ Activate the chatbot/auto-reply feature."
-)
+from pyrogram import Client, filters
+from pyrogram.types import InlineKeyboardButton, InlineKeyboardMarkup, CallbackQuery, Message
+
+BOT_USERNAME = "YourBotUsername"  # Change this
+START_IMG = "https://example.com/image.jpg"  # Your bot start/help image
+
+# Help Texts
+HELP_COMMANDS = {
+    "mute_unmute": "`/mute`, `/unmute` ➥ Mute or unmute group members.",
+    "ban": "`/ban`, `/unban` ➥ Ban or unban users from your group.",
+    "promote_demote": "`/promote`, `/demote` ➥ Promote or demote users.",
+    "fullpromote": "`/fullpromote` ➥ Give full admin rights to user.",
+    "edit": "`/edit` ➥ Edit a previously sent message.",
+    "joinmode": "`/joinmode` ➥ Configure how new members join.",
+    "warn": "`/warn`, `/resetwarns` ➥ Warn users or reset their warnings."
+}
 
 # /help command
-@app.on_message(filters.command("help"))
+@Client.on_message(filters.command("help"))
 async def help_command(_, message: Message):
     if message.chat.type.name != "PRIVATE":
         return await message.reply(
@@ -81,12 +85,55 @@ async def help_command(_, message: Message):
 
     await message.reply_photo(
         photo=START_IMG,
-        caption=HELP_TEXT,
+        caption="**❖ Help Menu ⏤͟͟͞͞★**\n\nनीचे से किसी भी बटन पर टैप करके उसका हेल्प मेनू खोलो:",
         reply_markup=InlineKeyboardMarkup([
-            [InlineKeyboardButton("• Back •", callback_data="go_back")]
+            [InlineKeyboardButton("Mute / Unmute", callback_data="help_mute_unmute"),
+             InlineKeyboardButton("Ban", callback_data="help_ban")],
+            [InlineKeyboardButton("Promote / Demote", callback_data="help_promote_demote")],
+            [InlineKeyboardButton("FullPromote", callback_data="help_fullpromote")],
+            [InlineKeyboardButton("Edit", callback_data="help_edit"),
+             InlineKeyboardButton("JoinMode", callback_data="help_joinmode"),
+             InlineKeyboardButton("Warn", callback_data="help_warn")],
+            [InlineKeyboardButton("• Close •", callback_data="go_back")]
         ])
     )
 
+# Help via callback buttons
+@Client.on_callback_query(filters.regex(r"help_(\w+)"))
+async def command_help(_, query: CallbackQuery):
+    command = query.matches[0].group(1)
+    help_text = HELP_COMMANDS.get(command, "No help found for this command.")
+
+    await query.message.edit_text(
+        f"**❖ Help Menu: `{command}`**\n\n{help_text}",
+        reply_markup=InlineKeyboardMarkup([
+            [InlineKeyboardButton("• Back to Help •", callback_data="show_help")],
+            [InlineKeyboardButton("• Close •", callback_data="go_back")]
+        ])
+    )
+
+# Show main help again
+@Client.on_callback_query(filters.regex("show_help"))
+async def show_main_help(_, query: CallbackQuery):
+    await query.message.edit_text(
+        "**❖ Help Menu ⏤͟͟͞͞★**\n\nनीचे से किसी भी बटन पर टैप करके उसका हेल्प मेनू खोलो:",
+        reply_markup=InlineKeyboardMarkup([
+            [InlineKeyboardButton("Mute / Unmute", callback_data="help_mute_unmute"),
+             InlineKeyboardButton("Ban", callback_data="help_ban")],
+            [InlineKeyboardButton("Promote / Demote", callback_data="help_promote_demote")],
+            [InlineKeyboardButton("FullPromote", callback_data="help_fullpromote")],
+            [InlineKeyboardButton("Edit", callback_data="help_edit"),
+             InlineKeyboardButton("JoinMode", callback_data="help_joinmode"),
+             InlineKeyboardButton("Warn", callback_data="help_warn")],
+            [InlineKeyboardButton("• Close •", callback_data="go_back")]
+        ])
+    )
+
+# Close button
+@Client.on_callback_query(filters.regex("go_back"))
+async def close_help(_, query: CallbackQuery):
+    await query.message.delete()
+    
 # Help via button
 @app.on_callback_query(filters.regex("show_help"))
 async def show_help(_, query: CallbackQuery):
