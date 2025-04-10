@@ -98,7 +98,7 @@ async def mute_command_handler(client, message):
 async def unmute_callback(client, callback_query):
     user_id = int(callback_query.data.split("_")[1])
     chat_id = callback_query.message.chat.id
-    from_user = callback_query.from_user  
+    from_user = callback_query.from_user
 
     chat_member = await client.get_chat_member(chat_id, from_user.id)
     if chat_member.status not in [enums.ChatMemberStatus.ADMINISTRATOR, enums.ChatMemberStatus.OWNER]:
@@ -106,17 +106,11 @@ async def unmute_callback(client, callback_query):
 
     try:
         user = await client.get_users(user_id)
-        mention_text = f"[{user.first_name}](tg://user?id={user.id})"
-        
-        await client.restrict_chat_member(chat_id, user_id, enums.ChatPermissions(
-            can_send_messages=True,
-            can_send_media_messages=True,
-            can_send_other_messages=True,
-            can_add_web_page_previews=True,
-        ))
+        mention = f"[{user.first_name}](tg://user?id={user.id})"
 
+        await client.restrict_chat_member(chat_id, user_id, FULL_PERMISSIONS)
         await callback_query.message.edit_text(
-            f"{mention_text} unmuted successfully.",
+            f"{mention} User unmuted successfully.",
             reply_markup=InlineKeyboardMarkup([[InlineKeyboardButton("Close", callback_data="close")]]),
             disable_web_page_preview=True
         )
