@@ -13,7 +13,7 @@ from MAFU.helper.database import add_user, add_chat
 START_IMG = "https://files.catbox.moe/jhlnjc.jpg"
 
 # Start caption with user and bot mention
-def get_start_caption(user, bot):
+def get_start_caption(user):
     return f"""
 **✨ ʜᴇʏ {user.mention}, ʙᴀʙʏ! ✨**
 
@@ -29,9 +29,6 @@ def get_start_caption(user, bot):
 **— ᴡɪᴛʜ ʟᴏᴠᴇ, ʏᴏᴜʀ ᴠɪʀᴛᴜᴀʟ ᴘʀᴏᴛᴇᴄᴛᴏʀ**
 """
 
-# Used in callbacks
-START_CAPTION = get_start_caption("User", BOT_USERNAME)
-
 START_BUTTONS = InlineKeyboardMarkup([
     [InlineKeyboardButton("• ᴀᴅᴅ ᴍᴇ ɪɴ ʏᴏᴜʀ ɢʀᴏᴜᴘ •", url=f"https://t.me/{BOT_USERNAME}?startgroup=true")],
     [
@@ -46,7 +43,7 @@ START_BUTTONS = InlineKeyboardMarkup([
 async def start_command(_, message: Message):
     if message.chat.type.name == "PRIVATE":
         await add_user(message.from_user.id)
-        caption = get_start_caption(message.from_user, app.me)
+        caption = get_start_caption(message.from_user)
         return await message.reply_photo(
             photo=START_IMG,
             caption=caption,
@@ -116,10 +113,11 @@ async def show_about(_, query: CallbackQuery):
 # Back to Start
 @app.on_callback_query(filters.regex("go_back"))
 async def go_back(_, query: CallbackQuery):
+    caption = get_start_caption(query.from_user)
     await query.message.edit_media(
         media=InputMediaPhoto(
             media=START_IMG,
-            caption=START_CAPTION
+            caption=caption
         ),
         reply_markup=START_BUTTONS
     )
