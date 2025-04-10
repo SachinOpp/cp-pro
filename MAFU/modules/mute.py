@@ -82,7 +82,6 @@ async def mute_command_handler(client: Client, message: Message):
         ])
         await message.reply_text(msg, reply_markup=keyboard)
 
-        # Logging
         user_username = f"@{user.username}" if user.username else "No username"
         log_msg = (
             f"**Mute Notification!**\n\n"
