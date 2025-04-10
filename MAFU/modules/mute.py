@@ -74,6 +74,13 @@ async def mute_command_handler(client, message):
         return
 
     try:
+        target = await client.get_chat_member(message.chat.id, user_id)
+        if target.status in [ChatMemberStatus.ADMINISTRATOR, ChatMemberStatus.OWNER]:
+            return await message.reply_text("**You can't mute an admin!**")
+    except Exception as e:
+        return await message.reply_text(f"**Failed to fetch user info:** `{e}`")
+
+    try:
         await client.restrict_chat_member(message.chat.id, user_id, MUTE_PERMISSIONS)
         user_mention = mention(user_id, first_name)
         admin_mention = mention(message.from_user.id, message.from_user.first_name)
@@ -87,6 +94,7 @@ async def mute_command_handler(client, message):
             [InlineKeyboardButton("Close", callback_data="close")]
         ])
         await message.reply_text(msg, reply_markup=keyboard)
+
     except ChatAdminRequired:
         await message.reply_text(
             "I need to be an admin with mute permissions!",
