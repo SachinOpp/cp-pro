@@ -32,7 +32,7 @@ async def toggle_bio_filter(client, message):
     chat_id = message.chat.id
     user_id = message.from_user.id
 
-    if not await is_admin(client, chat_id, user_id):
+    if not await is_admins(client, chat_id, user_id):
         await message.reply_text(
             "You must be an admin to use this command!",
             reply_markup=InlineKeyboardMarkup([[InlineKeyboardButton("Close", callback_data="close")]])
@@ -55,7 +55,7 @@ async def callback_handler(client, callback_query):
     chat_id = callback_query.message.chat.id
     user_id = callback_query.from_user.id
 
-    if not await is_admin(client, chat_id, user_id):
+    if not await is_admins(client, chat_id, user_id):
         await callback_query.answer("You are not an administrator!", show_alert=True)
         return
 
@@ -80,7 +80,7 @@ async def check_bio(client, message):
     chat_id = message.chat.id
     user = message.from_user
 
-    if not user or await is_admin(client, chat_id, user.id):
+    if not user or await is_admins(client, chat_id, user.id):
         return
 
     if not await get_bio_filter_status(chat_id):
