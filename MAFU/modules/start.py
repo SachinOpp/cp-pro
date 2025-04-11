@@ -10,10 +10,8 @@ from config import OWNER_ID, BOT_USERNAME
 from MAFU import MAFU as app
 from MAFU.helper.database import add_user, add_chat
 
-
 START_IMG = "https://files.catbox.moe/jhlnjc.jpg"
 
-# Start caption with user and bot mention
 def get_start_caption(user):
     return f"""
 **✨ ʜᴇʏ {user.mention}, ʙᴀʙʏ! ✨**
@@ -26,6 +24,14 @@ def get_start_caption(user):
 ➥ ᴀᴅᴅ ᴍᴇ ɪɴ ʏᴏᴜʀ ɢʀᴏᴜᴘ ᴀɴᴅ ꜱɪᴛ ʙᴀᴄᴋ, ʟᴇᴀᴠᴇ ᴛʜᴇ ʀᴇꜱᴛ ᴛᴏ ᴍᴇ!
 
 **— ᴡɪᴛʜ ʟᴏᴠᴇ, ʏᴏᴜʀ ᴠɪʀᴛᴜᴀʟ ᴘʀᴏᴛᴇᴄᴛᴏʀ**
+"""
+
+def get_group_caption(user):
+    return f"""
+**ᴛʜᴀɴᴋꜱ {user.mention} ꜰᴏʀ ᴀᴅᴅɪɴɢ ᴍᴇ!**
+
+ɪ'ᴍ ɴᴏᴡ ᴀᴄᴛɪᴠᴇ ɪɴ ᴛʜɪꜱ ɢʀᴏᴜᴘ ᴀɴᴅ ʀᴇᴀᴅʏ ᴛᴏ ᴘʀᴏᴛᴇᴄᴛ.
+➥ ᴍᴀᴋᴇ ꜱᴜʀᴇ ᴛᴏ ᴄʜᴇᴄᴋ ᴍʏ ꜱᴇᴛᴛɪɴɢꜱ ᴀɴᴅ ɢɪᴠᴇ ᴘʀᴏᴘᴇʀ ʀɪɢʜᴛꜱ.
 """
 
 START_BUTTONS = InlineKeyboardMarkup([
@@ -41,7 +47,10 @@ START_BUTTONS = InlineKeyboardMarkup([
     ]
 ])
 
-# /start command
+PRIVATE_START_BUTTON = InlineKeyboardMarkup([
+    [InlineKeyboardButton("• ᴘʀɪᴠᴀᴛᴇ ꜱᴛᴀʀᴛ •", url=f"https://t.me/{BOT_USERNAME}?start=help")]
+])
+
 @app.on_message(filters.command("start"))
 async def start_command(_, message: Message):
     if message.chat.type.name == "PRIVATE":
@@ -53,57 +62,27 @@ async def start_command(_, message: Message):
             reply_markup=START_BUTTONS
         )
     else:
-        await add_chat(message.chat.id)
+        # Reply in group with private usage message
         return await message.reply(
-            "**ᴛʜᴀɴᴋꜱ ꜰᴏʀ ᴀᴅᴅɪɴɢ ᴍᴇ!**\n\nɪ'ᴍ ɴᴏᴡ ᴀᴄᴛɪᴠᴇ ɪɴ ᴛʜɪꜱ ɢʀᴏᴜᴘ ᴀɴᴅ ʀᴇᴀᴅʏ ᴛᴏ ᴘʀᴏᴛᴇᴄᴛ."
+            "**ᴘʟᴇᴀꜱᴇ ᴜꜱᴇ /start ɪɴ ᴘʀɪᴠᴀᴛᴇ ᴄʜᴀᴛ ꜰᴏʀ ᴍᴏʀᴇ ɪɴꜰᴏ.**",
+            reply_markup=PRIVATE_START_BUTTON
         )
 
-# Help Texts
-HELP_COMMANDS = {
-    "mute_unmute": "`/mute`, `/unmute` ➥ Mute or unmute group members.",
-    "ban": "`/ban`, `/unban` ➥ Ban or unban users from your group.",
-    "promote_demote": "`/promote`, `/demote` ➥ Promote or demote users.",
-    "fullpromote": "`/fullpromote` ➥ Give full admin rights to user.",
-    "edit": "`/edit` ➥ Edit a previously sent message.",
-    "joinmode": "`/joinmode` ➥ Configure how new members join.",
-    "warn": "`/warn`, `/resetwarns` ➥ Warn users or reset their warnings."
-}
-
-# /help command
-@app.on_message(filters.command("help"))
-async def help_command(_, message: Message):
-    if message.chat.type.name != "PRIVATE":
-        return await message.reply(
-            "**Help command is only available in private chat.**",
-            reply_markup=InlineKeyboardMarkup([
-                [InlineKeyboardButton("• Open DM •", url=f"https://t.me/{BOT_USERNAME}?start=help")]
-            ])
-        )
-
-    await message.reply_photo(
-        photo=START_IMG,
-        caption="**❖ ᴄʜᴏᴏsᴇ ᴛʜᴇ ᴄᴀᴛᴇɢᴏʀʏ ғᴏʀ ᴡʜɪᴄʜ ʏᴏᴜ ɴᴇᴇᴅ ʜᴇʟᴘ.**\n**● ᴀsᴋ ʏᴏᴜʀ ᴅᴏᴜʙᴛs ᴀᴛ [sᴜᴘᴘᴏʀᴛ ᴄʜᴀɴɴᴇʟ](https://t.me/Copyright_Community).**\n**● ᴀʟʟ ᴄᴏᴍᴍᴀɴᴅs ᴄᴀɴ ʙᴇ ᴜsᴇᴅ ᴡɪᴛʜ: [ !, ., / ]**",
-        reply_markup=InlineKeyboardMarkup([
-            [
-                InlineKeyboardButton("Mute / Unmute", callback_data="help_mute_unmute"),
-                InlineKeyboardButton("Ban", callback_data="help_ban")
-            ],
-            [
-                InlineKeyboardButton("Promote / Demote", callback_data="help_promote_demote")
-            ],
-            [
-                InlineKeyboardButton("FullPromote", callback_data="help_fullpromote")
-            ],
-            [
-                InlineKeyboardButton("Edit", callback_data="help_edit"),
-                InlineKeyboardButton("JoinMode", callback_data="help_joinmode"),
-                InlineKeyboardButton("Warn", callback_data="help_warn")
-            ],
-            [
-                InlineKeyboardButton("• Back •", callback_data="go_back")
-            ]
-        ])
-    )
+@app.on_message(filters.new_chat_members)
+async def group_welcome(_, message: Message):
+    for member in message.new_chat_members:
+        if member.id == (await app.get_me()).id:
+            await add_chat(message.chat.id)
+            try:
+                await add_user(message.from_user.id)
+            except:
+                pass
+            caption = get_group_caption(message.from_user)
+            await message.reply_photo(
+                photo=START_IMG,
+                caption=caption,
+                reply_markup=START_BUTTONS
+            )
 
 # Help via callback buttons
 @app.on_callback_query(filters.regex(r"help_(\w+)"))
