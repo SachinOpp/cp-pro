@@ -55,7 +55,6 @@ async def callback_handler(client, callback_query):
     chat_id = callback_query.message.chat.id
     user_id = callback_query.from_user.id
 
-    # Only check admin for enable/disable actions
     if data.startswith("enable_bio_") or data.startswith("disable_bio_"):
         if not await is_admins(client, chat_id, user_id):
             await callback_query.answer("You are not an administrator!", show_alert=True)
@@ -83,6 +82,7 @@ async def callback_handler(client, callback_query):
         except Exception:
             pass
         await callback_query.answer("Closed")
+
     else:
         await callback_query.answer("Unknown action.")
 
