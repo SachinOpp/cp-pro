@@ -4,7 +4,7 @@ from pyrogram import Client, filters, enums, errors
 from pyrogram.types import InlineKeyboardMarkup, InlineKeyboardButton
 from MAFU import MAFU as app
 from motor.motor_asyncio import AsyncIOMotorClient
-from config import MONGO_URL, OTHER_LOGS
+from config import MONGO_URL, OTHER_LOGS, BOT_USERNAME
 
 mongo_client = AsyncIOMotorClient(MONGO_URL)
 db = mongo_client["BioFilterBot"]
