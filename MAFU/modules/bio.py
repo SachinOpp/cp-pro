@@ -5,7 +5,7 @@ from pyrogram.types import InlineKeyboardMarkup, InlineKeyboardButton
 from MAFU import MAFU as app
 from motor.motor_asyncio import AsyncIOMotorClient
 from config import MONGO_URL, OTHER_LOGS, BOT_USERNAME
-
+from MAFU.helper.admin import is_admins
 mongo_client = AsyncIOMotorClient(MONGO_URL)
 db = mongo_client["BioFilterBot"]
 bio_filter_collection = db["bio_filter"]
@@ -16,7 +16,7 @@ username_pattern = re.compile(r"@[\w]+")
 async def get_bio_filter_status(chat_id):
     data = await bio_filter_collection.find_one({"chat_id": chat_id})
     return data["enabled"] if data else False
-
+"""
 async def is_admin(client, chat_id, user_id):
     try:
         async for member in client.get_chat_members(chat_id, filter=enums.ChatMembersFilter.ADMINISTRATORS):
@@ -26,7 +26,7 @@ async def is_admin(client, chat_id, user_id):
     except Exception as e:
         print(f"[is_admin ERROR] {e}")
         return False
-
+"""
 @app.on_message(filters.command("biobot") & filters.group)
 async def toggle_bio_filter(client, message):
     chat_id = message.chat.id
