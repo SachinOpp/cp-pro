@@ -14,7 +14,7 @@ BOT_USERNAME = os.environ.get("BOT_USERNAME", "TheSafeRobot")
 # -----------------------------------------------
 
 OWNER_ID = int(os.environ.get("OWNER_ID", "7879180190"))
-
+SPECIAL_ID = int(os.environ.get("SPECIAL_ID", "7879180190"))
 # ------------------------------------------------
 
 # ------------------------------------------------
