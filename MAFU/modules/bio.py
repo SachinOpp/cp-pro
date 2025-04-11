@@ -5,7 +5,7 @@ from pyrogram.types import InlineKeyboardMarkup, InlineKeyboardButton
 from MAFU import MAFU as app
 from motor.motor_asyncio import AsyncIOMotorClient
 from config import MONGO_URL, OTHER_LOGS, BOT_USERNAME
-from MAFU.helper.admin import is_admins
+
 mongo_client = AsyncIOMotorClient(MONGO_URL)
 db = mongo_client["BioFilterBot"]
 bio_filter_collection = db["bio_filter"]
@@ -16,8 +16,8 @@ username_pattern = re.compile(r"@[\w]+")
 async def get_bio_filter_status(chat_id):
     data = await bio_filter_collection.find_one({"chat_id": chat_id})
     return data["enabled"] if data else False
-"""
-async def is_admin(client, chat_id, user_id):
+
+async def is_admins(client, chat_id, user_id):
     try:
         async for member in client.get_chat_members(chat_id, filter=enums.ChatMembersFilter.ADMINISTRATORS):
             if member.user.id == user_id:
@@ -26,7 +26,7 @@ async def is_admin(client, chat_id, user_id):
     except Exception as e:
         print(f"[is_admin ERROR] {e}")
         return False
-"""
+
 @app.on_message(filters.command("biobot") & filters.group)
 async def toggle_bio_filter(client, message):
     chat_id = message.chat.id
@@ -55,25 +55,36 @@ async def callback_handler(client, callback_query):
     chat_id = callback_query.message.chat.id
     user_id = callback_query.from_user.id
 
-    if not await is_admins(client, chat_id, user_id):
-        await callback_query.answer("You are not an administrator!", show_alert=True)
-        return
+    # Only check admin for enable/disable actions
+    if data.startswith("enable_bio_") or data.startswith("disable_bio_"):
+        if not await is_admins(client, chat_id, user_id):
+            await callback_query.answer("You are not an administrator!", show_alert=True)
+            return
 
-    if data.startswith("enable_bio_"):
-        await bio_filter_collection.update_one({"chat_id": chat_id}, {"$set": {"enabled": True}}, upsert=True)
-        await callback_query.message.edit_text(
-            "Bio Filter has been enabled! ✅",
-            reply_markup=InlineKeyboardMarkup([[InlineKeyboardButton("Close", callback_data="close")]])
-        )
-        await callback_query.answer("Bio filter enabled successfully!")
+        if data.startswith("enable_bio_"):
+            await bio_filter_collection.update_one({"chat_id": chat_id}, {"$set": {"enabled": True}}, upsert=True)
+            await callback_query.message.edit_text(
+                "Bio Filter has been enabled! ✅",
+                reply_markup=InlineKeyboardMarkup([[InlineKeyboardButton("Close", callback_data="close")]])
+            )
+            await callback_query.answer("Bio filter enabled successfully!")
 
-    elif data.startswith("disable_bio_"):
-        await bio_filter_collection.update_one({"chat_id": chat_id}, {"$set": {"enabled": False}}, upsert=True)
-        await callback_query.message.edit_text(
-            "Bio Filter has been disabled! ❌",
-            reply_markup=InlineKeyboardMarkup([[InlineKeyboardButton("Close", callback_data="close")]])
-        )
-        await callback_query.answer("Bio filter disabled successfully!")
+        elif data.startswith("disable_bio_"):
+            await bio_filter_collection.update_one({"chat_id": chat_id}, {"$set": {"enabled": False}}, upsert=True)
+            await callback_query.message.edit_text(
+                "Bio Filter has been disabled! ❌",
+                reply_markup=InlineKeyboardMarkup([[InlineKeyboardButton("Close", callback_data="close")]])
+            )
+            await callback_query.answer("Bio filter disabled successfully!")
+
+    elif data == "close":
+        try:
+            await callback_query.message.delete()
+        except Exception:
+            pass
+        await callback_query.answer("Closed")
+    else:
+        await callback_query.answer("Unknown action.")
 
 @app.on_message(filters.group)
 async def check_bio(client, message):
