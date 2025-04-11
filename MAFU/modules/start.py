@@ -17,14 +17,12 @@ START_IMG = "https://files.catbox.moe/jhlnjc.jpg"
 def get_start_caption(user):
     return f"""
 **✨ ʜᴇʏ {user.mention}, ʙᴀʙʏ! ✨**
-
 ɪ'ᴍ [{BOT_USERNAME}](https://t.me/{BOT_USERNAME}) – ʏᴏᴜʀ ʟᴏʏᴀʟ ᴀɪ ɢᴜᴀʀᴅ ʀᴇᴀᴅʏ ᴛᴏ ꜱᴇʀᴠᴇ ʏᴏᴜ!
 
 ɪ ᴄᴀɴ:
 • ꜱᴛᴏᴘ ꜱᴘᴀᴍᴍᴇʀꜱ • ꜱᴇɴᴅ ᴡᴀʀɴɪɴɢꜱ
 • ᴅᴇꜰᴇɴᴅ ʏᴏᴜʀ ɢʀᴏᴜᴘ
 • ᴀɴᴅ ᴇᴠᴇɴ ᴡʜɪꜱᴘᴇʀ ꜱᴇᴄʀᴇᴛꜱ...
-
 ➥ ᴀᴅᴅ ᴍᴇ ɪɴ ʏᴏᴜʀ ɢʀᴏᴜᴘ ᴀɴᴅ ꜱɪᴛ ʙᴀᴄᴋ, ʟᴇᴀᴠᴇ ᴛʜᴇ ʀᴇꜱᴛ ᴛᴏ ᴍᴇ!
 
 **— ᴡɪᴛʜ ʟᴏᴠᴇ, ʏᴏᴜʀ ᴠɪʀᴛᴜᴀʟ ᴘʀᴏᴛᴇᴄᴛᴏʀ**
@@ -35,11 +33,11 @@ START_BUTTONS = InlineKeyboardMarkup([
         InlineKeyboardButton("• ᴀᴅᴅ ᴍᴇ ɪɴ ʏᴏᴜʀ ɢʀᴏᴜᴘ •", url=f"https://t.me/{BOT_USERNAME}?startgroup=true")
     ],
     [
-        InlineKeyboardButton("• ʜᴇʟᴘ •", callback_data="show_help"),
-        InlineKeyboardButton("• ᴀʙᴏᴜᴛ •", callback_data="show_about")
+        InlineKeyboardButton("• ʟᴏɢs •", url="https://t.me/Copyright_logs"),
+        InlineKeyboardButton("• ᴜᴘᴅᴀᴛᴇ •", url="https://t.me/Copyright_Community")
     ],
     [
-        InlineKeyboardButton("• ᴏᴡɴᴇʀ •", user_id=OWNER_ID)
+        InlineKeyboardButton("• ʜᴇʟᴘ ᴀɴᴅ ᴄᴏᴍᴍᴀɴᴅ •", callback_data="show_help")
     ]
 ])
 
@@ -126,22 +124,27 @@ async def show_main_help(_, query: CallbackQuery):
     await query.message.edit_text(
         "**❖ ᴄʜᴏᴏsᴇ ᴛʜᴇ ᴄᴀᴛᴇɢᴏʀʏ ғᴏʀ ᴡʜɪᴄʜ ʏᴏᴜ ɴᴇᴇᴅ ʜᴇʟᴘ.**\n**● ᴀsᴋ ʏᴏᴜʀ ᴅᴏᴜʙᴛs ᴀᴛ [sᴜᴘᴘᴏʀᴛ ᴄʜᴀɴɴᴇʟ](https://t.me/Copyright_Community).**\n**● ᴀʟʟ ᴄᴏᴍᴍᴀɴᴅs ᴄᴀɴ ʙᴇ ᴜsᴇᴅ ᴡɪᴛʜ: [ !, ., / ]**",
         reply_markup=InlineKeyboardMarkup([
-            [InlineKeyboardButton("Mute | Unmute", callback_data="help_mute_unmute"),
-             InlineKeyboardButton("Ban | Unban", callback_data="help_ban")],
-            [InlineKeyboardButton("Promote | Demote", callback_data="help_promote_demote")],
-            [InlineKeyboardButton("FullPromote", callback_data="help_fullpromote")],
-            [InlineKeyboardButton("Edit", callback_data="help_edit"),
-             InlineKeyboardButton("JoinMode", callback_data="help_joinmode"),
-             InlineKeyboardButton("Warn", callback_data="help_warn")],
-            [InlineKeyboardButton("• Back •", callback_data="go_back")]
+            [
+                InlineKeyboardButton("Mute | Unmute", callback_data="help_mute_unmute"),
+                InlineKeyboardButton("Ban | Unban", callback_data="help_ban")
+            ],
+            [
+                InlineKeyboardButton("Promote | Demote", callback_data="help_promote_demote")
+            ],
+            [
+                InlineKeyboardButton("FullPromote", callback_data="help_fullpromote")
+            ],
+            [
+                InlineKeyboardButton("Edit", callback_data="help_edit"),
+                InlineKeyboardButton("JoinMode", callback_data="help_joinmode"),
+                InlineKeyboardButton("Warn", callback_data="help_warn")
+            ],
+            [
+                InlineKeyboardButton("• Back •", callback_data="go_back")
+            ]
         ])
     )
-"""
-# Close button
-@app.on_callback_query(filters.regex("go_back"))
-async def close_help(_, query: CallbackQuery):
-    await query.message.delete()
-    """
+    
 # Help via button
 @app.on_callback_query(filters.regex("show_help"))
 async def show_help(_, query: CallbackQuery):
