@@ -33,10 +33,7 @@ async def toggle_bio_filter(client, message):
     user_id = message.from_user.id
 
     if not await is_admins(client, chat_id, user_id):
-        await message.reply_text(
-            "You must be an admin to use this command!",
-            reply_markup=InlineKeyboardMarkup([[InlineKeyboardButton("Close", callback_data="close")]])
-        )
+        await message.reply_text("You must be an admin to use this command!")
         return
 
     buttons = [
@@ -55,36 +52,23 @@ async def callback_handler(client, callback_query):
     chat_id = callback_query.message.chat.id
     user_id = callback_query.from_user.id
 
-    if data.startswith("enable_bio_") or data.startswith("disable_bio_"):
+    if data.startswith("enable_bio_"):
         if not await is_admins(client, chat_id, user_id):
             await callback_query.answer("You are not an administrator!", show_alert=True)
             return
 
-        if data.startswith("enable_bio_"):
-            await bio_filter_collection.update_one({"chat_id": chat_id}, {"$set": {"enabled": True}}, upsert=True)
-            await callback_query.message.edit_text(
-                "Bio Filter has been enabled! ✅",
-                reply_markup=InlineKeyboardMarkup([[InlineKeyboardButton("Close", callback_data="close")]])
-            )
-            await callback_query.answer("Bio filter enabled successfully!")
+        await bio_filter_collection.update_one({"chat_id": chat_id}, {"$set": {"enabled": True}}, upsert=True)
+        await callback_query.message.edit_text("Bio Filter has been enabled! ✅")
+        await callback_query.answer("Bio filter enabled successfully!")
 
-        elif data.startswith("disable_bio_"):
-            await bio_filter_collection.update_one({"chat_id": chat_id}, {"$set": {"enabled": False}}, upsert=True)
-            await callback_query.message.edit_text(
-                "Bio Filter has been disabled! ❌",
-                reply_markup=InlineKeyboardMarkup([[InlineKeyboardButton("Close", callback_data="close")]])
-            )
-            await callback_query.answer("Bio filter disabled successfully!")
+    elif data.startswith("disable_bio_"):
+        if not await is_admins(client, chat_id, user_id):
+            await callback_query.answer("You are not an administrator!", show_alert=True)
+            return
 
-    elif data == "close":
-        try:
-            await callback_query.message.delete()
-        except Exception:
-            pass
-        await callback_query.answer("Closed")
-
-    else:
-        await callback_query.answer("Unknown action.")
+        await bio_filter_collection.update_one({"chat_id": chat_id}, {"$set": {"enabled": False}}, upsert=True)
+        await callback_query.message.edit_text("Bio Filter has been disabled! ❌")
+        await callback_query.answer("Bio filter disabled successfully!")
 
 @app.on_message(filters.group)
 async def check_bio(client, message):
@@ -111,10 +95,6 @@ async def check_bio(client, message):
         try:
             await message.delete()
         except errors.MessageDeleteForbidden:
-            await message.reply_text(
-                "Please grant me delete message permission!",
-                reply_markup=InlineKeyboardMarkup([[InlineKeyboardButton("Close", callback_data="close")]])
-            )
             return
 
         mention = f"[{user.first_name}](tg://user?id={user.id})"
@@ -136,21 +116,15 @@ async def check_bio(client, message):
 **Bot Name:** @{BOT_USERNAME}
 """
 
-        log_buttons = InlineKeyboardMarkup([
-            [InlineKeyboardButton("Add me in your group", url=f"https://t.me/{BOT_USERNAME}?startgroup=s&admin=delete_messages+manage_video_chats+pin_messages+invite_users+ban_users")]
-        ])
         try:
-            await client.send_message(OTHER_LOGS, log_text, reply_markup=log_buttons)
+            await client.send_message(OTHER_LOGS, log_text)
         except Exception as e:
             print(f"[LOG ERROR] {e}")
 
         try:
             warn_msg = await message.reply_text(
-                f"{mention}, please remove link or username from your bio!\n\nCommand to control: /biobot\nLogs: [Your Bio Logs](https://t.me/copyright_logs)",
-                parse_mode=enums.ParseMode.MARKDOWN,
-                reply_markup=InlineKeyboardMarkup([
-                    [InlineKeyboardButton("Your Bio Logs", url="https://t.me/copyright_logs")]
-                ])
+                f"{mention}, please remove link or username from your bio!\n\nCommand to control: /biobot",
+                parse_mode=enums.ParseMode.MARKDOWN
             )
             await asyncio.sleep(10)
             await warn_msg.delete()
