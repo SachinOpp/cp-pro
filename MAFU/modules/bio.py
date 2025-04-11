@@ -18,10 +18,14 @@ async def get_bio_filter_status(chat_id):
     return data["enabled"] if data else False
 
 async def is_admin(client, chat_id, user_id):
-    async for member in client.get_chat_members(chat_id, filter=enums.ChatMembersFilter.ADMINISTRATORS):
-        if member.user.id == user_id:
-            return True
-    return False
+    try:
+        async for member in client.get_chat_members(chat_id, filter=enums.ChatMembersFilter.ADMINISTRATORS):
+            if member.user.id == user_id:
+                return True
+        return False
+    except Exception as e:
+        print(f"[is_admin ERROR] {e}")
+        return False
 
 @app.on_message(filters.command("biobot") & filters.group)
 async def toggle_bio_filter(client, message):
@@ -79,14 +83,17 @@ async def check_bio(client, message):
     if not user or await is_admin(client, chat_id, user.id):
         return
 
-    user_full = await client.get_chat(user.id)
-    bio = user_full.bio
-
-    # अगर bio ही नहीं है, तो कुछ मत करो
-    if not bio:
+    if not await get_bio_filter_status(chat_id):
         return
 
-    if not await get_bio_filter_status(chat_id):
+    try:
+        user_full = await client.get_chat(user.id)
+        bio = user_full.bio
+    except Exception as e:
+        print(f"[get_chat ERROR] {e}")
+        return
+
+    if not bio:
         return
 
     if re.search(url_pattern, bio) or re.search(username_pattern, bio):
@@ -121,14 +128,20 @@ async def check_bio(client, message):
         log_buttons = InlineKeyboardMarkup([
             [InlineKeyboardButton("Add me in your group", url=f"https://t.me/{BOT_USERNAME}?startgroup=s&admin=delete_messages+manage_video_chats+pin_messages+invite_users+ban_users")]
         ])
-        await client.send_message(OTHER_LOGS, log_text, reply_markup=log_buttons)
+        try:
+            await client.send_message(OTHER_LOGS, log_text, reply_markup=log_buttons)
+        except Exception as e:
+            print(f"[LOG ERROR] {e}")
 
-        warn_msg = await message.reply_text(
-            f"{mention}, please remove link or username from your bio!\n\nCommand to control: /biobot\nLogs: [Your Bio Logs](https://t.me/copyright_logs)",
-            parse_mode=enums.ParseMode.MARKDOWN,
-            reply_markup=InlineKeyboardMarkup([
-                [InlineKeyboardButton("Your Bio Logs", url="https://t.me/copyright_logs")]
-            ])
-        )
-        await asyncio.sleep(10)
-        await warn_msg.delete()
+        try:
+            warn_msg = await message.reply_text(
+                f"{mention}, please remove link or username from your bio!\n\nCommand to control: /biobot\nLogs: [Your Bio Logs](https://t.me/copyright_logs)",
+                parse_mode=enums.ParseMode.MARKDOWN,
+                reply_markup=InlineKeyboardMarkup([
+                    [InlineKeyboardButton("Your Bio Logs", url="https://t.me/copyright_logs")]
+                ])
+            )
+            await asyncio.sleep(10)
+            await warn_msg.delete()
+        except Exception as e:
+            print(f"[WARN MSG ERROR] {e}")
