@@ -13,6 +13,20 @@ bio_filter_collection = db["bio_filter"]
 url_pattern = re.compile(r"(https?://|www\.)[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}(/[a-zA-Z0-9._%+-]*)?")
 username_pattern = re.compile(r"@[\w]+")
 
+# Add a flag to toggle bio filter state
+async def get_bio_filter_status():
+    doc = await bio_filter_collection.find_one({"filter": "enabled"})
+    if doc and doc.get("status", False):
+        return True
+    return False
+
+async def set_bio_filter_status(enabled: bool):
+    await bio_filter_collection.update_one(
+        {"filter": "enabled"},
+        {"$set": {"status": enabled}},
+        upsert=True
+    )
+
 async def is_admins(client, chat_id, user_id):
     try:
         async for member in client.get_chat_members(chat_id, filter=enums.ChatMembersFilter.ADMINISTRATORS):
@@ -25,14 +39,21 @@ async def is_admins(client, chat_id, user_id):
 
 @app.on_message(filters.group)
 async def check_bio(client, message):
-    if message.text and message.text.startswith("/"):
-        return  # Ignore commands
-
     chat_id = message.chat.id
     user = message.from_user
 
     if not user or await is_admins(client, chat_id, user.id):
         return
+
+    # Check if it's a command and ignore it (Commands will be handled separately)
+    if message.text and message.text.startswith("/"):
+        return  # Ignore commands, continue with bio filter
+
+    # Get current bio filter status (Enabled/Disabled)
+    bio_filter_enabled = await get_bio_filter_status()
+
+    if not bio_filter_enabled:
+        return  # Bio filter is disabled, don't proceed
 
     try:
         user_full = await client.get_chat(user.id)
@@ -44,6 +65,7 @@ async def check_bio(client, message):
     if not bio:
         return
 
+    # Check if the bio contains a URL or username
     if re.search(url_pattern, bio) or re.search(username_pattern, bio):
         try:
             await message.delete()
@@ -90,3 +112,20 @@ async def check_bio(client, message):
             await warn_msg.delete()
         except Exception as e:
             print(f"[WARN MSG ERROR] {e}")
+
+# Add toggle command to enable/disable bio checking
+@app.on_message(filters.command("toggle_bio_check"))
+async def toggle_bio_check(client, message):
+    # Only allow admins to use this command
+    if not await is_admins(client, message.chat.id, message.from_user.id):
+        await message.reply_text("You are not an admin of this group!")
+        return
+
+    bio_filter_enabled = await get_bio_filter_status()
+
+    # Toggle the status
+    new_status = not bio_filter_enabled
+    await set_bio_filter_status(new_status)
+
+    status_message = "Bio filter has been **enabled**" if new_status else "Bio filter has been **disabled**"
+    await message.reply_text(status_message)
