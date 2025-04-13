@@ -98,8 +98,6 @@ async def unban_user(client, message):
         await message.reply_text("I need admin rights to unban users.")
 
 # Unban Button Callback
-from pyrogram.types import InlineKeyboardMarkup, InlineKeyboardButton, LinkPreviewOptions
-
 @app.on_callback_query(filters.regex(r"^unban_(\d+)$"))
 async def unban_btn_callback(client, cb):
     try:
