@@ -25,6 +25,9 @@ async def is_admins(client, chat_id, user_id):
 
 @app.on_message(filters.group)
 async def check_bio(client, message):
+    if message.text and message.text.startswith("/"):
+        return  # Ignore commands
+
     chat_id = message.chat.id
     user = message.from_user
 
