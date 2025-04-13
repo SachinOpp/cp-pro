@@ -121,11 +121,13 @@ async def toggle_bio_check(client, message):
         await message.reply_text("You are not an admin of this group!")
         return
 
+    # Get current bio filter status
     bio_filter_enabled = await get_bio_filter_status()
 
-    # Toggle the status
+    # Toggle the status (True -> False or False -> True)
     new_status = not bio_filter_enabled
     await set_bio_filter_status(new_status)
 
+    # Reply back to the admin with the status update
     status_message = "Bio filter has been **enabled**" if new_status else "Bio filter has been **disabled**"
     await message.reply_text(status_message)
