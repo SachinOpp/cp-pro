@@ -41,23 +41,31 @@ PRIVATE_START_BUTTON = InlineKeyboardMarkup([
 
 @app.on_message(filters.command("start"))
 async def start_command(_, message: Message):
-    user = message.from_user
-    chat = message.chat
+    try:
+        user = message.from_user
+        chat = message.chat
 
-    # Add to database
-    await add_user(user.id)
-    if chat.type in ["group", "supergroup"]:
-        await add_chat(chat.id)
+        # Debugging logs (remove later)
+        print(f"Chat Type: {chat.type}")
+        print(f"From User: {user.id if user else 'None'}")
 
-    # If private chat
-    if message.chat.type == "private":
-        await message.reply_photo(
-            photo=START_IMG,
-            caption=get_start_caption(user),
-            reply_markup=START_BUTTONS
-        )
-    else:
-        await message.reply_text(
-            text=f"**ʜᴇʏ {user.mention}, ᴛʜᴀɴᴋꜱ ꜰᴏʀ ᴀᴅᴅɪɴɢ ᴍᴇ!**",
-            reply_markup=PRIVATE_START_BUTTON
-        )
+        # Add to database
+        if user:
+            await add_user(user.id)
+        if chat.type in ["group", "supergroup"]:
+            await add_chat(chat.id)
+
+        # Private message
+        if chat.type == "private":
+            await message.reply_photo(
+                photo=START_IMG,
+                caption=get_start_caption(user),
+                reply_markup=START_BUTTONS
+            )
+        else:
+            await message.reply_text(
+                text=f"**ʜᴇʏ {user.mention if user else 'ᴜꜱᴇʀ'}, ᴛʜᴀɴᴋꜱ ꜰᴏʀ ᴀᴅᴅɪɴɢ ᴍᴇ!**",
+                reply_markup=PRIVATE_START_BUTTON
+            )
+    except Exception as e:
+        print(f"Error in /start: {e}")
