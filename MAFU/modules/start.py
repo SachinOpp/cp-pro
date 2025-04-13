@@ -41,7 +41,7 @@ PRIVATE_START_BUTTON = InlineKeyboardMarkup([
 
 from pyrogram.enums import ChatType  # Import this for comparing enums properly
 
-@app.on_message(filters.command("start"))
+@app.on_message(filters.command("start") & (filters.private | filters.group))
 async def start_command(_, message: Message):
     user = message.from_user
     chat = message.chat
