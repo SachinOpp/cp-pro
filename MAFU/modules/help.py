@@ -52,7 +52,7 @@ def help_back_markup():
     return InlineKeyboardMarkup(private_help_panel())
 
 
-@app.on_message(filters.command(["help"]) & filters.group)
+@app.on_message(filters.command(["help"]))
 async def help_com_group(client, message: Message):
     await message.reply_text(
         "नीचे दिए गए बटनों से सहायता जानकारी देखें:",
