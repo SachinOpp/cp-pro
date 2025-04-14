@@ -1,78 +1,82 @@
-from pyrogram import filters, filters
-from pyrogram.types import CallbackQuery
-from pyrogram.types import InlineKeyboardMarkup, InlineKeyboardButton, Message
+from typing import Union
+from pyrogram import filters, types
+from pyrogram.types import InlineKeyboardMarkup, Message, InlineKeyboardButton
 from MAFU import MAFU as app
-
-# HELP TEXTS
-HELP_1 = "Help Section 1"
-HELP_2 = "Help Section 2"
-HELP_3 = "Help Section 3"
-HELP_4 = "Help Section 4"
-HELP_5 = "Help Section 5"
-HELP_6 = "Help Section 6"
-HELP_7 = "Help Section 7"
-HELP_8 = "Help Section 8"
-HELP_9 = "Help Section 9"
-HELP_10 = "Help Section 10"
-HELP_11 = "Help Section 11"
-HELP_12 = "Help Section 12"
-HELP_13 = "Help Section 13"
-HELP_14 = "Help Section 14"
-HELP_15 = "Help Section 15"
-
-HELPABLE = {
-    "hb1": HELP_1, "hb2": HELP_2, "hb3": HELP_3, "hb4": HELP_4, "hb5": HELP_5,
-    "hb6": HELP_6, "hb7": HELP_7, "hb8": HELP_8, "hb9": HELP_9, "hb10": HELP_10,
-    "hb11": HELP_11, "hb12": HELP_12, "hb13": HELP_13, "hb14": HELP_14, "hb15": HELP_15
-}
+from MAFU.modules.utils.inline.help import help_back_markup, private_help_panel
+from config import BANNED_USERS, START_IMG_URL, SUPPORT_CHAT
+from strings import get_string, helpers
 
 
-def private_help_panel():
-    return [
-        [InlineKeyboardButton("1", callback_data="help_callback hb1"),
-         InlineKeyboardButton("2", callback_data="help_callback hb2"),
-         InlineKeyboardButton("3", callback_data="help_callback hb3"),
-         InlineKeyboardButton("4", callback_data="help_callback hb4"),
-         InlineKeyboardButton("5", callback_data="help_callback hb5")],
-        [InlineKeyboardButton("6", callback_data="help_callback hb6"),
-         InlineKeyboardButton("7", callback_data="help_callback hb7"),
-         InlineKeyboardButton("8", callback_data="help_callback hb8"),
-         InlineKeyboardButton("9", callback_data="help_callback hb9"),
-         InlineKeyboardButton("10", callback_data="help_callback hb10")],
-        [InlineKeyboardButton("11", callback_data="help_callback hb11"),
-         InlineKeyboardButton("12", callback_data="help_callback hb12"),
-         InlineKeyboardButton("13", callback_data="help_callback hb13"),
-         InlineKeyboardButton("14", callback_data="help_callback hb14"),
-         InlineKeyboardButton("15", callback_data="help_callback hb15")],
-        [InlineKeyboardButton("Close", callback_data="help_close")]
-    ]
-
-
-def help_back_markup():
-    return InlineKeyboardMarkup(private_help_panel())
-
-
-@app.on_message(filters.command(["help"]))
-async def help_com_group(client, message: Message):
-    await message.reply_text(
-        "नीचे दिए गए बटनों से सहायता जानकारी देखें:",
-        reply_markup=help_back_markup()
-    )
-
-
-@app.on_callback_query(filters.regex("help_callback"))
-async def helper_cb(client, callback_query: CallbackQuery):
-    cb = callback_query.data.strip().split(None, 1)[1]
-    if cb in HELPABLE:
-        await callback_query.edit_message_text(
-            HELPABLE[cb],
-            reply_markup=help_back_markup(),
-            disable_web_page_preview=True
+@app.on_message(filters.command(["help"]) & filters.private & ~BANNED_USERS)
+@app.on_callback_query(filters.regex("settings_back_helper") & ~BANNED_USERS)
+async def helper_private(
+    client: app, update: Union[types.Message, types.CallbackQuery]
+):
+    is_callback = isinstance(update, types.CallbackQuery)
+    if is_callback:
+        try:
+            await update.answer()
+        except:
+            pass
+        _ = get_string("en")
+        keyboard = help_pannel(_, True)
+        await update.edit_message_text(
+            _["help_1"].format(SUPPORT_CHAT), reply_markup=keyboard
         )
-        await callback_query.answer()
+    else:
+        try:
+            await update.delete()
+        except:
+            pass
+        _ = get_string("en")
+        keyboard = help_pannel(_)
+        await update.reply_photo(
+            photo=START_IMG_URL,
+            caption=_["help_1"].format(SUPPORT_CHAT),
+            reply_markup=keyboard,
+        )
 
 
-@app.on_callback_query(filters.regex("help_close"))
-async def close_help_cb(client, callback_query: CallbackQuery):
-    await callback_query.message.delete()
-    await callback_query.answer("Closed Help", show_alert=False)
+@app.on_message(filters.command(["help"]) & filters.group & ~BANNED_USERS)
+async def help_com_group(client, message: Message):
+    _ = get_string("en")
+    keyboard = private_help_panel(_)
+    await message.reply_text(_["help_2"], reply_markup=InlineKeyboardMarkup(keyboard))
+
+
+@app.on_callback_query(filters.regex("help_callback") & ~BANNED_USERS)
+async def helper_cb(client, CallbackQuery):
+    callback_data = CallbackQuery.data.strip()
+    cb = callback_data.split(None, 1)[1]
+    _ = get_string("en")
+    keyboard = help_back_markup(_)
+    if cb == "hb1":
+        await CallbackQuery.edit_message_text(helpers.HELP_1, reply_markup=keyboard)
+    elif cb == "hb2":
+        await CallbackQuery.edit_message_text(helpers.HELP_2, reply_markup=keyboard)
+    elif cb == "hb3":
+        await CallbackQuery.edit_message_text(helpers.HELP_3, reply_markup=keyboard)
+    elif cb == "hb4":
+        await CallbackQuery.edit_message_text(helpers.HELP_4, reply_markup=keyboard)
+    elif cb == "hb5":
+        await CallbackQuery.edit_message_text(helpers.HELP_5, reply_markup=keyboard)
+    elif cb == "hb6":
+        await CallbackQuery.edit_message_text(helpers.HELP_6, reply_markup=keyboard)
+    elif cb == "hb7":
+        await CallbackQuery.edit_message_text(helpers.HELP_7, reply_markup=keyboard)
+    elif cb == "hb8":
+        await CallbackQuery.edit_message_text(helpers.HELP_8, reply_markup=keyboard)
+    elif cb == "hb9":
+        await CallbackQuery.edit_message_text(helpers.HELP_9, reply_markup=keyboard)
+    elif cb == "hb10":
+        await CallbackQuery.edit_message_text(helpers.HELP_10, reply_markup=keyboard)
+    elif cb == "hb11":
+        await CallbackQuery.edit_message_text(helpers.HELP_11, reply_markup=keyboard)
+    elif cb == "hb12":
+        await CallbackQuery.edit_message_text(helpers.HELP_12, reply_markup=keyboard)
+    elif cb == "hb13":
+        await CallbackQuery.edit_message_text(helpers.HELP_13, reply_markup=keyboard)
+    elif cb == "hb14":
+        await CallbackQuery.edit_message_text(helpers.HELP_14, reply_markup=keyboard)
+    elif cb == "hb15":
+        await CallbackQuery.edit_message_text(helpers.HELP_15, reply_markup=keyboard)
