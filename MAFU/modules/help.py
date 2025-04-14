@@ -1,4 +1,5 @@
 from pyrogram import filters, filters
+from pyrogram.types import CallbackQuery
 from pyrogram.types import InlineKeyboardMarkup, InlineKeyboardButton, Message
 from MAFU import MAFU as app
 
