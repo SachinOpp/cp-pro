@@ -46,7 +46,7 @@ async def is_admins(client, chat_id, user_id):
         return False
 
 # Bio Filter Handler (Ignore commands)
-@app.on_message(filters.group & filters.text & ~filters.command())
+@app.on_message(filters.group & filters.text & ~filters.command([""]))
 async def check_bio(client, message):
     chat_id = message.chat.id
     user = message.from_user
