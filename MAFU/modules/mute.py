@@ -56,7 +56,7 @@ FULL_PERMISSIONS = ChatPermissions(
 MUTE_PERMISSIONS = ChatPermissions()
 
 # =================== MUTE COMMAND ===================
-@app.on_message(filters.command("mute", prefixes=["/", "!", "%", ",", ".", "@", "#"]))
+@app.on_message(filters.command("mute", prefixes=["/", "!", "%", ",", ".", "@", "#"]) & filters.group)
 @is_admins
 async def mute_command_handler(client, message):
     user_id, first_name, reason = await extract_user_and_reason(message, client)
@@ -99,7 +99,7 @@ async def mute_command_handler(client, message):
         )
 
 # =================== UNMUTE BY COMMAND ===================
-@app.on_message(filters.command("unmute", prefixes=["/", "!", "%", ",", ".", "@", "#"]))
+@app.on_message(filters.command("unmute", prefixes=["/", "!", "%", ",", ".", "@", "#"]) & filters.group)
 @is_admins
 async def unmute_user(client, message):
     user_id, first_name, _ = await extract_user_and_reason(message, client)
