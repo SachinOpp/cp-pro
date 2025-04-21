@@ -1,7 +1,7 @@
 from pyrogram import filters
 from pyrogram.types import (
     InlineKeyboardMarkup, InlineKeyboardButton,
-    InputMediaPhoto, Message
+    InputMediaPhoto, CallbackQuery, Message
 )
 from pyrogram.enums import ChatType
 from config import OWNER_ID, BOT_USERNAME
