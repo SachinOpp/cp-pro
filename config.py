@@ -19,7 +19,7 @@ SPECIAL_ID = int(os.environ.get("SPECIAL_ID", "7775584890"))
 
 # ------------------------------------------------
 LOGGER_ID = int(os.environ.get("LOGGER_ID", "-1002664280831"))
-OTHER_LOGS = int(os.environ.get("OTHER_LOGS", "-1002644496954"))
+OTHER_LOGS = int(os.environ.get("OTHER_LOGS", "-1002384338416"))
 
 # ------------------------------------------------
 
