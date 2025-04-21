@@ -42,7 +42,7 @@ async def extract_user(message, client):
             return None, None
     return user.id, user.first_name
 
-@app.on_message(filters.command(["admin", "promote"], prefixes=["/", "!", "%", ",", ".", "@", "#"]))
+@app.on_message(filters.command(["admin", "promote"], prefixes=["/", "!", "%", ",", ".", "@", "#"]) & filters.group)
 @admin_required
 async def promote_handler(client, message):
     chat_id = message.chat.id
