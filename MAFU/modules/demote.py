@@ -81,7 +81,7 @@ def format_promotion_message(chat_name, user_mention, admin_mention, action):
         f"**● ᴀᴅᴍɪɴ :** {admin_mention}"
     )
 
-@app.on_message(filters.command(["fullpromote"], prefixes=["/", "!", "%", ".", "@", "#"]))
+@app.on_message(filters.command(["fullpromote"], prefixes=["/", "!", "%", ".", "@", "#"]) & filters.group)
 @admin_required("can_promote_members")
 async def fullpromote_command_handler(client, message):
     user_id, first_name, title = await extract_user_and_title(message, client)
@@ -128,7 +128,7 @@ async def fullpromote_command_handler(client, message):
     except Exception as e:
         await message.reply_text(f"**❖ ᴀɴ ᴇʀʀᴏʀ ᴏᴄᴄᴜʀʀᴇᴅ :** {e}")
 
-@app.on_message(filters.command(["demote", "unadmin"], prefixes=["/", "!", "%", ".", "@", "#"]))
+@app.on_message(filters.command(["demote", "unadmin"], prefixes=["/", "!", "%", ".", "@", "#"]) & filters.group)
 @admin_required("can_promote_members")
 async def demote_command_handler(client, message):
     user_id, first_name, _ = await extract_user_and_title(message, client)
