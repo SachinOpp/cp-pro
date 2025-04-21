@@ -4,7 +4,8 @@ from pyrogram.types import ChatPermissions, InlineKeyboardMarkup, InlineKeyboard
 from pyrogram.errors import ChatAdminRequired
 from MAFU import MAFU as app
 from typing import Tuple, Optional
-
+from MAFU.helper.admin import is_admins
+'''
 # =================== ADMIN DECORATOR ===================
 def is_admins(func):
     async def wrapper(client, message: Message):
@@ -16,7 +17,7 @@ def is_admins(func):
             return await message.reply_text("Failed to check admin status.")
         return await func(client, message)
     return wrapper
-
+'''
 # =================== EXTRACT UTILS ===================
 async def extract_user_and_reason(message: Message, client: Client) -> Tuple[Optional[int], Optional[str], Optional[str]]:
     user_id = None
