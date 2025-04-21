@@ -2,13 +2,13 @@ from pyrogram import Client, filters, enums
 from pyrogram.types import InlineKeyboardMarkup, InlineKeyboardButton
 from pyrogram.errors import ChatAdminRequired, UserNotParticipant
 from functools import wraps
-
+from MAFU.helper.admin import is_admins
 from MAFU import MAFU as app  # Replace with your Client name
 
 # Mention Function
 def mention(user_id, name):
     return f"[{name}](tg://user?id={user_id})"
-
+'''
 # Admin Check Decorator
 def is_admins(func):
     @wraps(func)
@@ -21,7 +21,7 @@ def is_admins(func):
             return await message.reply_text("Failed to check admin status.")
         return await func(client, message, *args, **kwargs)
     return wrapper
-
+'''
 # Extract User & Reason
 async def extract_user_and_reason(message, client):
     args = message.text.split(maxsplit=2)
