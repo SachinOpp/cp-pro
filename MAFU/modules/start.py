@@ -118,11 +118,6 @@ async def help_command(_, message: Message):
 '''
 #=×=×=×=×=×=×=×=×=×=×=×=×°×=×=×=×=×=×=×°×°=×=×=×=×=×=×=×=×=×=×=§=×=×=×=×=§=§=×=×=×=×=×=×
 
-from pyrogram import Client, filters
-from pyrogram.types import InlineKeyboardMarkup, InlineKeyboardButton, Message, CallbackQuery
-
-app = Client("my_bot")
-
 # Main Help Menu
 MAIN_HELP_MENU = InlineKeyboardMarkup([
     [
@@ -138,6 +133,13 @@ MAIN_HELP_MENU = InlineKeyboardMarkup([
         InlineKeyboardButton("• back •", callback_data="go_back")
     ]
 ])
+
+@app.on_callback_query(filters.regex("show_help"))
+async def show_help_callback(client, query: CallbackQuery):
+    await query.message.edit(
+        "**Select a Help Category:**",
+        reply_markup=MAIN_HELP_MENU
+    )
 
 # Help Command
 @app.on_message(filters.command("help"))
@@ -165,7 +167,7 @@ async def help_ban(client, query: CallbackQuery):
 ᴛʜɪs ᴡɪʟʟ ᴡᴏʀᴋ ᴏɴʟʏ ɪꜰ ʙᴏᴛ ʜᴀꜱ ʙᴀɴ ʀɪɢʜᴛs.
 """,
         reply_markup=InlineKeyboardMarkup([
-            [InlineKeyboardButton("‹ ʙᴀᴄᴋ", callback_data="help_back")]
+            [InlineKeyboardButton("‹ ʙᴀᴄᴋ", callback_data="show_help")]
         ])
     )
 
@@ -175,7 +177,7 @@ async def help_mute(client, query: CallbackQuery):
     await query.message.edit(
         text="**❖ ᴍᴜᴛᴇ ᴄᴏᴍᴍᴀɴᴅꜱ ➠**\n\n• `/mute` : ᴍᴜᴛᴇ ᴀ ᴜꜱᴇʀ\n• `/unmute` : ᴜɴᴍᴜᴛᴇ ᴀ ᴜꜱᴇʀ",
         reply_markup=InlineKeyboardMarkup([
-            [InlineKeyboardButton("‹ ʙᴀᴄᴋ", callback_data="help_back")]
+            [InlineKeyboardButton("‹ ʙᴀᴄᴋ", callback_data="show_help")]
         ])
     )
 
@@ -185,7 +187,7 @@ async def help_edit(client, query: CallbackQuery):
     await query.message.edit(
         text="**❖ ᴇᴅɪᴛ ᴄᴏᴍᴍᴀɴᴅꜱ ➠**\n\n• `/editsnipe` : ꜱʜᴏᴡ ʟᴀꜱᴛ ᴇᴅɪᴛᴇᴅ ᴍᴇꜱꜱᴀɢᴇ\n• `/editlog` : ꜱᴇᴇ ᴇᴅɪᴛ ʟᴏɢ",
         reply_markup=InlineKeyboardMarkup([
-            [InlineKeyboardButton("‹ ʙᴀᴄᴋ", callback_data="help_back")]
+            [InlineKeyboardButton("‹ ʙᴀᴄᴋ", callback_data="show_help")]
         ])
     )
 
@@ -195,7 +197,7 @@ async def help_admin(client, query: CallbackQuery):
     await query.message.edit(
         text="**❖ ᴀᴅᴍɪɴ ᴄᴏᴍᴍᴀɴᴅꜱ ➠**\n\n• `/promote`\n• `/demote`\n• `/admins`",
         reply_markup=InlineKeyboardMarkup([
-            [InlineKeyboardButton("‹ ʙᴀᴄᴋ", callback_data="help_back")]
+            [InlineKeyboardButton("‹ ʙᴀᴄᴋ", callback_data="show_help")]
         ])
     )
 
@@ -205,14 +207,6 @@ async def help_auth(client, query: CallbackQuery):
     await query.message.edit(
         text="**❖ ᴀᴜᴛʜ ᴜꜱᴇʀꜱ ➠**\n\n• `/auth add` @user\n• `/auth remove` @user\n• `/auth list`",
         reply_markup=InlineKeyboardMarkup([
-            [InlineKeyboardButton("‹ ʙᴀᴄᴋ", callback_data="help_back")]
+            [InlineKeyboardButton("‹ ʙᴀᴄᴋ", callback_data="show_help")]
         ])
-    )
-
-# Back Button Callback
-@app.on_callback_query(filters.regex("help_back"))
-async def help_back(client, query: CallbackQuery):
-    await query.message.edit(
-        "**Select a Help Category:**",
-        reply_markup=MAIN_HELP_MENU
     )
